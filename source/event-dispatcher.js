@@ -2,18 +2,34 @@
  * Created by Oleg Galaburda on 09.02.16.
  */
 
-function Event(type, data) {
-  Object.defineProperties(this, {
-    type: {
-      value: type,
-      enumerable: true
-    },
-    data: {
-      value: data,
-      enumerable: true
+var Event = (function() {
+  function Event(type, data) {
+    var _defaultPrevented = false;
+
+    function isDefaultPrevented() {
+      return _defaultPrevented;
     }
-  });
-}
+
+    function preventDefault() {
+      _defaultPrevented = true;
+    }
+
+    Object.defineProperties(this, {
+      type: {
+        value: type,
+        enumerable: true
+      },
+      data: {
+        value: data,
+        enumerable: true
+      }
+    });
+    this.preventDefault = preventDefault;
+    this.isDefaultPrevented = isDefaultPrevented;
+  }
+
+  return Event;
+})();
 
 function isObject(value) {
   return (typeof value === 'object') && (value !== null);
@@ -64,19 +80,45 @@ var EventListeners = (function() {
     delete this._listeners[eventType];
   }
 
-  function call(eventType, data, target) {
-    var priorities = getHashByKey(eventType, this._listeners);
+  function call(event, target) {
+    var _stopped = false;
+    var _immediatelyStopped = false;
+
+    function stopPropagation() {
+      _stopped = true;
+    }
+
+    function stopImmediatePropagation() {
+      _immediatelyStopped = true;
+    }
+
+    /*
+    function StoppableEvent() {
+     this.stopPropagation = stopPropagation;
+     this.stopImmediatePropagation = stopImmediatePropagation;
+    }
+    StoppableEvent.prototype = event;
+    StoppableEvent.prototype.constructor = event.constructor;
+    event = new StoppableEvent();
+    */
+
+    event.stopPropagation = stopPropagation;
+    event.stopImmediatePropagation = stopImmediatePropagation;
+
+    var priorities = getHashByKey(event.type, this._listeners);
     if (priorities) {
       var list = Object.getOwnPropertyNames(priorities).sort(function(a, b) {
         return a - b;
       });
       var length = list.length;
       for (var index = 0; index < length; index++) {
+        if(_stopped) break;
         var handlers = priorities[list[index]];
         var handlersLength = handlers.length;
         for (var handlersIndex = 0; handlersIndex < handlersLength; handlersIndex++) {
+          if(_immediatelyStopped) break;
           var handler = handlers[handlersIndex];
-          handler.call(target, data);
+          handler.call(target, event);
         }
       }
     }
@@ -144,7 +186,7 @@ function EventDispatcher() {
     if (!EventDispatcher.isObject(event)) {
       event = new EventDispatcher.Event(String(event), data);
     }
-    _listeners.call(event.type, event);
+    _listeners.call(event);
   }
 
   this.addEventListener = addEventListener;
