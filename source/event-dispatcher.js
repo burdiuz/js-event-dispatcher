@@ -3,6 +3,11 @@
  */
 
 var Event = (function() {
+
+  function toJSON() {
+    return {type: this.type, data: this.data};
+  }
+
   function Event(type, data) {
     var _defaultPrevented = false;
 
@@ -27,6 +32,8 @@ var Event = (function() {
     this.preventDefault = preventDefault;
     this.isDefaultPrevented = isDefaultPrevented;
   }
+
+  Event.prototype.toJSON = toJSON;
 
   return Event;
 })();
@@ -93,14 +100,14 @@ var EventListeners = (function() {
     }
 
     /*
-    function StoppableEvent() {
+     function StoppableEvent() {
      this.stopPropagation = stopPropagation;
      this.stopImmediatePropagation = stopImmediatePropagation;
-    }
-    StoppableEvent.prototype = event;
-    StoppableEvent.prototype.constructor = event.constructor;
-    event = new StoppableEvent();
-    */
+     }
+     StoppableEvent.prototype = event;
+     StoppableEvent.prototype.constructor = event.constructor;
+     event = new StoppableEvent();
+     */
 
     event.stopPropagation = stopPropagation;
     event.stopImmediatePropagation = stopImmediatePropagation;
@@ -112,11 +119,11 @@ var EventListeners = (function() {
       });
       var length = list.length;
       for (var index = 0; index < length; index++) {
-        if(_stopped) break;
+        if (_stopped) break;
         var handlers = priorities[list[index]];
         var handlersLength = handlers.length;
         for (var handlersIndex = 0; handlersIndex < handlersLength; handlersIndex++) {
-          if(_immediatelyStopped) break;
+          if (_immediatelyStopped) break;
           var handler = handlers[handlersIndex];
           handler.call(target, event);
         }
@@ -183,10 +190,7 @@ function EventDispatcher() {
   }
 
   function dispatchEvent(event, data) {
-    if (!EventDispatcher.isObject(event)) {
-      event = new EventDispatcher.Event(String(event), data);
-    }
-    _listeners.call(event);
+    _listeners.call(EventDispatcher.getEvent(event, data));
   }
 
   this.addEventListener = addEventListener;
@@ -196,6 +200,15 @@ function EventDispatcher() {
   this.dispatchEvent = dispatchEvent;
 }
 
+function getEvent(eventOrType, optionalData) {
+  var event = eventOrType;
+  if (!EventDispatcher.isObject(eventOrType)) {
+    event = new EventDispatcher.Event(String(eventOrType), optionalData);
+  }
+  return event;
+}
+
 EventDispatcher.isObject = isObject;
 
+EventDispatcher.getEvent = getEvent;
 EventDispatcher.Event = Event;
