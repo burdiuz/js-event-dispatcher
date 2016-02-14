@@ -10,17 +10,13 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine'],
+    frameworks: ['mocha', 'sinon-chai'],
 
 
     // list of files / patterns to load in the browser
     files: [
-      {pattern: 'bower_components/jquery/dist/jquery.js', watched: false},
-      {pattern: 'bower_components/underscore/underscore.js', watched: false},
-      {pattern: 'bower_components/backbone/backbone.js', watched: false},
-      {pattern: 'node_modules/phantomjs-polyfill/bind-polyfill.js', watched: false},
-      'source/backbone-properties.js',
-      'tests/backbone-properties.spec.js'
+      'source/event-dispatcher.js',
+      'tests/event-dispatcher.spec.js'
     ],
 
 
@@ -38,7 +34,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress', 'coverage', 'coveralls'],
+    reporters: ['coverage', 'progress', 'coveralls'],
 
 
     // optionally, configure the reporter
