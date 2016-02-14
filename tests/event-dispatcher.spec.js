@@ -329,6 +329,49 @@ describe('EventDispatcher', function() {
         });
       });
 
+
+      describe('When stopping propagation', function() {
+        beforeEach(function() {
+          dispatcher.addEventListener('eventA', handlerA);
+          dispatcher.addEventListener('eventA', function(event) {
+            event.stopPropagation();
+          });
+          dispatcher.addEventListener('eventA', handlerAA);
+          dispatcher.addEventListener('eventA', handlerAAA);
+          dispatcher.addEventListener('eventA', handlerA1, 1);
+          dispatcher.addEventListener('eventA', handlerA_1, -1);
+          dispatcher.dispatchEvent('eventA');
+        });
+        it('should stop after processing all listeners of same priority', function() {
+          expect(handlerA1).to.be.calledOnce;
+          expect(handlerA).to.be.calledOnce;
+          expect(handlerAA).to.be.calledOnce;
+          expect(handlerAAA).to.be.calledOnce;
+          expect(handlerA_1).to.not.be.called;
+        });
+      });
+
+      describe('When stopping immediate propagation', function() {
+        beforeEach(function() {
+          dispatcher.addEventListener('eventA', handlerA);
+          dispatcher.addEventListener('eventA', function(event) {
+            event.stopImmediatePropagation();
+          });
+          dispatcher.addEventListener('eventA', handlerAA);
+          dispatcher.addEventListener('eventA', handlerAAA);
+          dispatcher.addEventListener('eventA', handlerA1, 1);
+          dispatcher.addEventListener('eventA', handlerA_1, -1);
+          dispatcher.dispatchEvent('eventA');
+        });
+        it('should stop immediately, dropping all next listeners', function() {
+          expect(handlerA1).to.be.calledOnce;
+          expect(handlerA).to.be.calledOnce;
+          expect(handlerAA).to.not.be.called;
+          expect(handlerAAA).to.not.be.called;
+          expect(handlerA_1).to.not.be.called;
+        });
+      });
+
     });
   });
 });
