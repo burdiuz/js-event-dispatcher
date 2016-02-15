@@ -16,7 +16,8 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'source/event-dispatcher.js',
-      'tests/event-dispatcher.spec.js'
+      'tests/event-dispatcher.spec.js',
+      'tests/event.spec.js'
     ],
 
 

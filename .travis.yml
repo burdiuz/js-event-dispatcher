@@ -3,6 +3,4 @@ node_js:
   - 4.1
 
 before_script:
-  - npm install -g bower
-  - bower install
   - gulp
