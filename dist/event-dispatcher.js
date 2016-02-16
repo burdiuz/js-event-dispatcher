@@ -44,7 +44,7 @@
           enumerable: true
         },
         data: {
-          value: data,
+          value: data || null,
           enumerable: true
         }
       });
@@ -119,18 +119,18 @@
       }
   
       /*
-       function StoppableEvent() {
-       this.stopPropagation = stopPropagation;
-       this.stopImmediatePropagation = stopImmediatePropagation;
-       }
-       StoppableEvent.prototype = event;
-       StoppableEvent.prototype.constructor = event.constructor;
-       event = new StoppableEvent();
+       * Three ways to implement this
+       * 1. As its now -- just assign and delete after event cycle finished
+       * 2. Use EventDispatcher.setupOptional()
+       * 3. In this method create function StoppableEvent that will extend from this event and add these functions,
+       *    then instantiate it for this one cycle.
        */
-  
-      event.stopPropagation = stopPropagation;
-      event.stopImmediatePropagation = stopImmediatePropagation;
-  
+       event.stopPropagation = stopPropagation;
+       event.stopImmediatePropagation = stopImmediatePropagation;
+      /*
+      var rmStopPropagation = EventDispatcher.setupOptional(event, 'stopPropagation', stopPropagation);
+      var rmStopImmediatePropagation = EventDispatcher.setupOptional(event, 'stopImmediatePropagation', stopImmediatePropagation);
+      */
       var priorities = getHashByKey(event.type, this._listeners);
       if (priorities) {
         var list = Object.getOwnPropertyNames(priorities).sort(function(a, b) {
@@ -148,6 +148,12 @@
           }
         }
       }
+      delete event.stopPropagation;
+      delete event.stopImmediatePropagation;
+      /*
+      rmStopPropagation();
+      rmStopImmediatePropagation();
+      */
     }
   
     function createList(eventType, priority, target) {
@@ -193,7 +199,7 @@
     var _listeners = new EventListeners();
   
     function addEventListener(eventType, listener, priority) {
-      _listeners.add(eventType, listener, -priority);
+      _listeners.add(eventType, listener, -priority || 0);
     }
   
     function hasEventListener(eventType) {
@@ -226,6 +232,23 @@
     }
     return event;
   }
+  
+  /*
+  function setupOptional(target, name, value) {
+    var cleaner = null;
+    if (name in target) {
+      cleaner = function() {
+      };
+    } else {
+      target[name] = value;
+      cleaner = function() {
+        delete target[name];
+      };
+    }
+    return cleaner;
+  }
+  EventDispatcher.setupOptional = setupOptional;
+  */
   
   EventDispatcher.isObject = isObject;
   
