@@ -16,7 +16,6 @@
   ],
   "ignore": [
     "**/.*",
-    "source",
     "tests",
     "gulpfile.js",
     "karma.conf.js",
