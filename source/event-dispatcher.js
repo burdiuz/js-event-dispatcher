@@ -106,12 +106,12 @@ var EventListeners = (function() {
      * 3. In this method create function StoppableEvent that will extend from this event and add these functions,
      *    then instantiate it for this one cycle.
      */
-     event.stopPropagation = stopPropagation;
-     event.stopImmediatePropagation = stopImmediatePropagation;
+    event.stopPropagation = stopPropagation;
+    event.stopImmediatePropagation = stopImmediatePropagation;
     /*
-    var rmStopPropagation = EventDispatcher.setupOptional(event, 'stopPropagation', stopPropagation);
-    var rmStopImmediatePropagation = EventDispatcher.setupOptional(event, 'stopImmediatePropagation', stopImmediatePropagation);
-    */
+     var rmStopPropagation = EventDispatcher.setupOptional(event, 'stopPropagation', stopPropagation);
+     var rmStopImmediatePropagation = EventDispatcher.setupOptional(event, 'stopImmediatePropagation', stopImmediatePropagation);
+     */
     var priorities = getHashByKey(event.type, this._listeners);
     if (priorities) {
       var list = Object.getOwnPropertyNames(priorities).sort(function(a, b) {
@@ -132,9 +132,9 @@ var EventListeners = (function() {
     delete event.stopPropagation;
     delete event.stopImmediatePropagation;
     /*
-    rmStopPropagation();
-    rmStopImmediatePropagation();
-    */
+     rmStopPropagation();
+     rmStopImmediatePropagation();
+     */
   }
 
   function createList(eventType, priority, target) {
@@ -172,8 +172,12 @@ var EventListeners = (function() {
 
   return EventListeners;
 })();
-
-function EventDispatcher() {
+/**
+ *
+ * @param eventPreprocessor {?Function}
+ * @constructor
+ */
+function EventDispatcher(eventPreprocessor) {
   /**
    * @type {EventListeners}
    */
@@ -196,7 +200,11 @@ function EventDispatcher() {
   }
 
   function dispatchEvent(event, data) {
-    _listeners.call(EventDispatcher.getEvent(event, data));
+    var eventObject = EventDispatcher.getEvent(event, data);
+    if (eventPreprocessor) {
+      eventObject = eventPreprocessor.call(this, eventObject);
+    }
+    _listeners.call(eventObject);
   }
 
   this.addEventListener = addEventListener;
@@ -215,21 +223,21 @@ function getEvent(eventOrType, optionalData) {
 }
 
 /*
-function setupOptional(target, name, value) {
-  var cleaner = null;
-  if (name in target) {
-    cleaner = function() {
-    };
-  } else {
-    target[name] = value;
-    cleaner = function() {
-      delete target[name];
-    };
-  }
-  return cleaner;
-}
-EventDispatcher.setupOptional = setupOptional;
-*/
+ function setupOptional(target, name, value) {
+ var cleaner = null;
+ if (name in target) {
+ cleaner = function() {
+ };
+ } else {
+ target[name] = value;
+ cleaner = function() {
+ delete target[name];
+ };
+ }
+ return cleaner;
+ }
+ EventDispatcher.setupOptional = setupOptional;
+ */
 
 EventDispatcher.isObject = isObject;
 

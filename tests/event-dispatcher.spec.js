@@ -95,6 +95,57 @@ describe('EventDispatcher', function() {
       dispatcher = new EventDispatcher();
     });
 
+    describe('When created with preprocessor', function() {
+      var preprocessor, listener, dispatcher;
+      beforeEach(function() {
+        preprocessor = sinon.spy(function(event) {
+          return {type: event.type, data: 'processed'};
+        });
+        dispatcher = new EventDispatcher(preprocessor);
+        listener = sinon.spy();
+        dispatcher.addEventListener('event', listener);
+      });
+
+      describe('When dispatch by eventType', function() {
+        beforeEach(function() {
+          dispatcher.dispatchEvent('event', 'anything');
+        });
+        it('should call preprocessor', function() {
+          expect(preprocessor).to.be.calledOnce;
+        });
+        it('preprocessor should receive one argument', function() {
+          var args = preprocessor.getCall(0).args;
+          expect(args).to.have.length(1);
+        });
+        it('preprocessor should receive event object', function() {
+          var event = preprocessor.getCall(0).args[0];
+          expect(event.type).to.be.equal('event');
+          expect(event.data).to.be.equal('anything');
+        });
+        it('preprocessor should receive scope of dispatchEvent method', function() {
+          expect(preprocessor).to.be.calledOn(dispatcher);
+        });
+        it('listener should receive processed event', function() {
+          var event = listener.getCall(0).args[0];
+          expect(event.data).to.be.equal('processed');
+        });
+      });
+
+      describe('When dispatch by event object', function() {
+        beforeEach(function() {
+          dispatcher.dispatchEvent({type: 'event', data: 'anything'});
+        });
+        it('preprocessor should receive event object', function() {
+          var event = preprocessor.getCall(0).args[0];
+          expect(event).to.be.eql({type: 'event', data: 'anything'});
+        });
+        it('listener should receive processed event', function() {
+          var event = listener.getCall(0).args[0];
+          expect(event.data).to.be.equal('processed');
+        });
+      });
+    });
+
     describe('When manage listeners', function() {
       beforeEach(function() {
         dispatcher.addEventListener('eventA', handlerA);

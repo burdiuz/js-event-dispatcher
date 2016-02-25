@@ -14,6 +14,7 @@ Just another EventDispatcher/[EventTarget](https://developer.mozilla.org/en-US/d
 * `dispatchEvent(eventType:String, data:Object=null):void` -- Dispatch event of `eventType` and pass `data`. Will create object of built-in class Event and pass it as first argument  to listeners.
 * `dispatchEvent(event:Object):void` -- Event object that should be fired, can be any object. Only requirement -- it must contain field `type` with event type.
 
+EventDispatcher constructor accepts optional argument `eventPreprocessor(event:Object):Object`, function that receive event object as argument and should return same or new/changed event object that will be passed to event listeners.    
 
 ### Event
 Built-in class to represent dispatched event.

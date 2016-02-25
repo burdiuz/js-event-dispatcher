@@ -1,7 +1,7 @@
 {
   "name": "event-dispatcher",
   "description": "EventDispatcher is a JavaScript class that adds events support to custom objects",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": [
     "dist/event-dispatcher.min.js"
   ],
