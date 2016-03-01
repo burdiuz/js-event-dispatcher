@@ -28,7 +28,7 @@ function MyClass() {
   }
 }
 ```
-or `apply()` in your class, to obtain EventDispatcher functionality
+or `apply()` to your "class" function, to obtain EventDispatcher functionality
 ```javascript 
 function MyClass() {
   EventDispatcher.apply(this);
