@@ -81,8 +81,14 @@ function eventPreprocessor(event){
 var dispatcher = new EventDispatcher(eventPreprocessor);
 dispatcher.dispatchEvent('eventType');
 ```
-`eventPreprocessor()` function will be called with event object and returned object will be used.
-
+`eventPreprocessor()` function will be called with event object and returned object will be used.  
+  
+Example available in project's `example` folder. To try example first run server
+```javascript
+node server
+```
+And then go to [http://localhost:8081/example/index.html](http://localhost:8081/example/index.html)
+  
 ## API
 
 ### EventDispatcher
