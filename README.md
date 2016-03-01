@@ -5,7 +5,86 @@
 
 Just another EventDispatcher/[EventTarget](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget) implementation.
 
+## Installation
+Easy to install with [bower](http://bower.io/) or [npm](https://www.npmjs.com/) package managers, by adding this repository to dependencies
+```javascript
+"dependencies": {
+  "event-dispatcher": "git://github.com/burdiuz/js-event-dispatcher.git"
+}
+```
+
+## Usage
+
+EventDispatcher distribution package is wrapped into UMD wrapper, so it can be used with any AMD module loader, nodejs `require()` or without any.
+To start using EventDispatcher, just instantiate it on its own
+```javascript
+function MyClass() {
+  var _dispatcher = new EventDispatcher();
+  this.addEventListener = _dispatcher.addEventListener;
+  this.hasEventListener = _dispatcher.hasEventListener;
+  this.removeEventListener = _dispatcher.removeEventListener;
+  this.doSomething = function() {
+	  _dispatcher.dispatchEvent('didSomething');
+  }
+}
+```
+or `apply()` in your class, to obtain EventDispatcher functionality
+```javascript 
+function MyClass() {
+  EventDispatcher.apply(this);
+  this.doSomething = function() {
+	  this.dispatchEvent('didSomething');
+  }
+}
+```
+After instantiating `MyClass`, every call of `doSomething()` will fire event `didSomething` and every listener attached to this event will be called with event object as argument.
+```javascript
+var myObj = new MyClass();
+myObj.addEventListener('didSomething', function(event) {
+	console.log('My Listener', event.type);
+});
+myObj.doSomething();
+```
+When adding listeners they will be executed in same order as they where added. To change order you can use optional `priority` argument to `addEventListener()` method.
+```javascript
+myObj.addEventListener('didSomething', function(event) {
+	console.log('Prioritized Listener', event.type);
+}, 1);
+myObj.doSomething();
+```
+By default priority is set to 0, and you can specify higher priority >0 or lower <0, only integer values are allowed.
+
+To fire event you should use `dispatchEvent()` method, it can be used in three ways:
+You can pass only event type string. In this case event object will be created by `EventDispatcher`
+```javascript
+var dispatcher = new EventDispatcher();
+dispatcher.dispatchEvent('eventType');
+```
+With event type you can specify any data, as second argument, that should be passed with event
+```javascript
+dispatcher.addEventListener('eventType', function(event) {
+	console.log('My Listener', event.type, event.data);
+});
+dispatcher.dispatchEvent('eventType', {myData: 'something'});
+```
+Also you can pass event object, it must contain `type:String` property
+```javascript
+dispatcher.dispatchEvent({type: 'eventType', data: 'data is optional'});
+```
+
+If you want full control of events that fire from your EventDispatcher, you can specify event pre-processor function that will be called for each event before it fired. This function should return same or new event object.
+```javascript
+function eventPreprocessor(event){
+	event.data = event.data || {};
+	return event;
+}
+var dispatcher = new EventDispatcher(eventPreprocessor);
+dispatcher.dispatchEvent('eventType');
+```
+`eventPreprocessor()` function will be called with event object and returned object will be used.
+
 ## API
+
 ### EventDispatcher
 * `addEventListener(eventType:String, listener:Function, priority:int=0):void` -- Add listener to event type. Additionally priority can be set, higher values allow call listeners before others, lower -- after. Same listener can be added to event type using different priorities. By default, 0. 
 * `hasEventListener(eventType:String):void` -- Check if listener was added to event type. 
