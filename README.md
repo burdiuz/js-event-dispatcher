@@ -105,6 +105,7 @@ Objects of Event class are used when dispatchEvent() method is called with `even
 
 Any event(instance of built-in Event class or any other object passed as event) gains additional methods when its being dispatched. After cycle finished, these methods will be removed from event object.
 * `stopPropagation():void` -- Stop event propagation after processing all listeners of same priority.
-* `stopImmediatePropagation():void` -- Stop event propagation on current listener.
+* `stopImmediatePropagation():void` -- Stop event propagation on current listener.  
+  
   
 > Written with [StackEdit](https://stackedit.io/).
