@@ -104,7 +104,7 @@ EventDispatcher constructor accepts optional argument `eventPreprocessor(event:O
 ### Event
 Built-in class to represent dispatched event.
 Objects of Event class are used when dispatchEvent() method is called with `eventType`. 
-* **type:String - Event type.
+* **type**:String - Event type.
 * **data**:Object - Data object passed to `EventDispatcher.dispatchEvent()` method.
 * **preventDefault**():void - Will change "prevented" flag from FALSE to TRUE, it can be requested via `isDefaultPrevented()` method.
 * **isDefaultPrevented**():Boolean - Will return TRUE if `preventDefault()` was called.
