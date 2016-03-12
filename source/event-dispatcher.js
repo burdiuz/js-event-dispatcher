@@ -38,10 +38,6 @@ var Event = (function() {
   return Event;
 })();
 
-function isObject(value) {
-  return (typeof value === 'object') && (value !== null);
-}
-
 var EventListeners = (function() {
   function add(eventType, handler, priority) {
     var handlers = createList(eventType, priority, this._listeners);
@@ -172,12 +168,19 @@ var EventListeners = (function() {
 
   return EventListeners;
 })();
+
+var EVENTDISPATCHER_NOINIT = {};
+
 /**
  *
  * @param eventPreprocessor {?Function}
  * @constructor
  */
 function EventDispatcher(eventPreprocessor) {
+  if (eventPreprocessor === EVENTDISPATCHER_NOINIT) {
+    // create noinit prototype
+    return;
+  }
   /**
    * @type {EventListeners}
    */
@@ -214,12 +217,20 @@ function EventDispatcher(eventPreprocessor) {
   this.dispatchEvent = dispatchEvent;
 }
 
-function getEvent(eventOrType, optionalData) {
+function EventDispatcher_isObject(value) {
+  return (typeof value === 'object') && (value !== null);
+}
+
+function EventDispatcher_getEvent(eventOrType, optionalData) {
   var event = eventOrType;
   if (!EventDispatcher.isObject(eventOrType)) {
     event = new EventDispatcher.Event(String(eventOrType), optionalData);
   }
   return event;
+}
+
+function EventDispatcher_createNoinitPrototype() {
+  return new EventDispatcher(EVENTDISPATCHER_NOINIT);
 }
 
 /*
@@ -239,7 +250,8 @@ function getEvent(eventOrType, optionalData) {
  EventDispatcher.setupOptional = setupOptional;
  */
 
-EventDispatcher.isObject = isObject;
+EventDispatcher.isObject = EventDispatcher_isObject;
 
-EventDispatcher.getEvent = getEvent;
+EventDispatcher.getEvent = EventDispatcher_getEvent;
+EventDispatcher.createNoinitPrototype = EventDispatcher_createNoinitPrototype;
 EventDispatcher.Event = Event;

@@ -75,6 +75,22 @@ describe('EventDispatcher', function() {
 
   });
 
+  describe('createNoinitPrototype()', function() {
+    it('should result in EventDispatcher instance', function() {
+      expect(EventDispatcher.createNoinitPrototype()).to.be.an.instanceof(EventDispatcher);
+    });
+    it('result should not have any members', function() {
+      var instance = EventDispatcher.createNoinitPrototype();
+      for (var name in instance) {
+        if (instance.hasOwnProperty(name)) {
+          assert(false, 'NOINIT prototype must be empty instance without any members');
+        }
+      }
+      expect(instance.dispatchEvent).to.not.be.ok;
+      expect(instance.addEventListener).to.not.be.ok;
+    });
+  });
+
   describe('Instance', function() {
     var dispatcher = null;
     var handlerA = null;
