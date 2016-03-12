@@ -57,10 +57,6 @@
     return Event;
   })();
   
-  function isObject(value) {
-    return (typeof value === 'object') && (value !== null);
-  }
-  
   var EventListeners = (function() {
     function add(eventType, handler, priority) {
       var handlers = createList(eventType, priority, this._listeners);
@@ -191,77 +187,108 @@
   
     return EventListeners;
   })();
+  
+  var EVENTDISPATCHER_NOINIT = {};
+  
   /**
    *
    * @param eventPreprocessor {?Function}
    * @constructor
    */
-  function EventDispatcher(eventPreprocessor) {
-    /**
-     * @type {EventListeners}
-     */
-    var _listeners = new EventListeners();
+  var EventDispatcher = (function (){
   
-    function addEventListener(eventType, listener, priority) {
-      _listeners.add(eventType, listener, -priority || 0);
-    }
+    var LISTENERS_FIELD = Symbol('event.dispatcher::listeners');
   
-    function hasEventListener(eventType) {
-      return _listeners.has(eventType);
-    }
+    var PREPROCESSOR_FIELD = Symbol('event.dispatcher::preprocessor');
   
-    function removeEventListener(eventType, listener) {
-      _listeners.remove(eventType, listener);
-    }
-  
-    function removeAllEventListeners(eventType) {
-      _listeners.removeAll(eventType);
-    }
-  
-    function dispatchEvent(event, data) {
-      var eventObject = EventDispatcher.getEvent(event, data);
-      if (eventPreprocessor) {
-        eventObject = eventPreprocessor.call(this, eventObject);
+    function EventDispatcher(eventPreprocessor) {
+      if (eventPreprocessor === EVENTDISPATCHER_NOINIT) {
+        // create noinit prototype
+        return;
       }
-      _listeners.call(eventObject);
+      /**
+       * @type {EventListeners}
+       */
+      Object.defineProperty(this, LISTENERS_FIELD, {
+        value: new EventListeners()
+      });
+      Object.defineProperty(this, PREPROCESSOR_FIELD, {
+        value: eventPreprocessor
+      });
     }
   
-    this.addEventListener = addEventListener;
-    this.hasEventListener = hasEventListener;
-    this.removeEventListener = removeEventListener;
-    this.removeAllEventListeners = removeAllEventListeners;
-    this.dispatchEvent = dispatchEvent;
-  }
   
-  function getEvent(eventOrType, optionalData) {
-    var event = eventOrType;
-    if (!EventDispatcher.isObject(eventOrType)) {
-      event = new EventDispatcher.Event(String(eventOrType), optionalData);
+  
+    function _addEventListener(eventType, listener, priority) {
+      this[LISTENERS_FIELD].add(eventType, listener, -priority || 0);
     }
-    return event;
-  }
   
-  /*
-   function setupOptional(target, name, value) {
-   var cleaner = null;
-   if (name in target) {
-   cleaner = function() {
-   };
-   } else {
-   target[name] = value;
-   cleaner = function() {
-   delete target[name];
-   };
-   }
-   return cleaner;
-   }
-   EventDispatcher.setupOptional = setupOptional;
-   */
+    function _hasEventListener(eventType) {
+      return this[LISTENERS_FIELD].has(eventType);
+    }
   
-  EventDispatcher.isObject = isObject;
+    function _removeEventListener(eventType, listener) {
+      this[LISTENERS_FIELD].remove(eventType, listener);
+    }
   
-  EventDispatcher.getEvent = getEvent;
-  EventDispatcher.Event = Event;
+    function _removeAllEventListeners(eventType) {
+      this[LISTENERS_FIELD].removeAll(eventType);
+    }
+  
+    function _dispatchEvent(event, data) {
+      var eventObject = EventDispatcher.getEvent(event, data);
+      if (this[PREPROCESSOR_FIELD]) {
+        eventObject = this[PREPROCESSOR_FIELD].call(this, eventObject);
+      }
+      this[LISTENERS_FIELD].call(eventObject);
+    }
+  
+    EventDispatcher.prototype.addEventListener = _addEventListener;
+    EventDispatcher.prototype.hasEventListener = _hasEventListener;
+    EventDispatcher.prototype.removeEventListener = _removeEventListener;
+    EventDispatcher.prototype.removeAllEventListeners = _removeAllEventListeners;
+    EventDispatcher.prototype.dispatchEvent = _dispatchEvent;
+  
+    function EventDispatcher_isObject(value) {
+      return (typeof value === 'object') && (value !== null);
+    }
+  
+    function EventDispatcher_getEvent(eventOrType, optionalData) {
+      var event = eventOrType;
+      if (!EventDispatcher.isObject(eventOrType)) {
+        event = new EventDispatcher.Event(String(eventOrType), optionalData);
+      }
+      return event;
+    }
+  
+    function EventDispatcher_createNoInitPrototype() {
+      return new EventDispatcher(EVENTDISPATCHER_NOINIT);
+    }
+  
+    /*
+     function setupOptional(target, name, value) {
+     var cleaner = null;
+     if (name in target) {
+     cleaner = function() {
+     };
+     } else {
+     target[name] = value;
+     cleaner = function() {
+     delete target[name];
+     };
+     }
+     return cleaner;
+     }
+     EventDispatcher.setupOptional = setupOptional;
+     */
+  
+    EventDispatcher.isObject = EventDispatcher_isObject;
+  
+    EventDispatcher.getEvent = EventDispatcher_getEvent;
+    EventDispatcher.createNoInitPrototype = EventDispatcher_createNoInitPrototype;
+    EventDispatcher.Event = Event;
+    return EventDispatcher;
+  })();
   
   return EventDispatcher;
 }));
