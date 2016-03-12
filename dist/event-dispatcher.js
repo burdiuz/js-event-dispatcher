@@ -195,7 +195,7 @@
    * @param eventPreprocessor {?Function}
    * @constructor
    */
-  var EventDispatcher = (function (){
+  var EventDispatcher = (function() {
   
     var LISTENERS_FIELD = Symbol('event.dispatcher::listeners');
   
@@ -216,7 +216,6 @@
         value: eventPreprocessor
       });
     }
-  
   
   
     function _addEventListener(eventType, listener, priority) {
@@ -261,6 +260,10 @@
       return event;
     }
   
+    function EventDispatcher_create(eventPreprocessor) {
+      return new EventDispatcher(eventPreprocessor);
+    }
+  
     function EventDispatcher_createNoInitPrototype() {
       return new EventDispatcher(EVENTDISPATCHER_NOINIT);
     }
@@ -285,6 +288,7 @@
     EventDispatcher.isObject = EventDispatcher_isObject;
   
     EventDispatcher.getEvent = EventDispatcher_getEvent;
+    EventDispatcher.create = EventDispatcher_create;
     EventDispatcher.createNoInitPrototype = EventDispatcher_createNoInitPrototype;
     EventDispatcher.Event = Event;
     return EventDispatcher;

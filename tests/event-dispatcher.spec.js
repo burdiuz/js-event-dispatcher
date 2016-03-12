@@ -75,6 +75,12 @@ describe('EventDispatcher', function() {
 
   });
 
+  describe('create()', function() {
+    it('should result in EventDispatcher instance', function() {
+      expect(EventDispatcher.create()).to.be.an.instanceof(EventDispatcher);
+    });
+  });
+
   describe('createNoInitPrototype()', function() {
     it('should result in EventDispatcher instance', function() {
       expect(EventDispatcher.createNoInitPrototype()).to.be.an.instanceof(EventDispatcher);
