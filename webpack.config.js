@@ -8,10 +8,10 @@ const p = (value) => {
 const mainConfig = {
   context: __dirname,
   entry: {
-    lib: p('source/index.js')
+    'event-dispatcher': p('source/index.js')
   },
   output: {
-    library: 'lib-project',
+    library: 'EventDispatcher',
     libraryTarget: 'umd',
     filename: 'dist/[name].js',
   },
@@ -21,7 +21,8 @@ const mainConfig = {
         test: /\.js$/,
         include: [
           p('source'),
-          p('tests')
+          p('tests'),
+          p('node_modules/SymbolImpl')
         ],
         loader: 'babel-loader'
       }

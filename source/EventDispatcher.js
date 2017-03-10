@@ -2,7 +2,7 @@
  * Created by Oleg Galaburda on 09.02.16.
  */
 
-import SymbolImpl from './SymbolImpl';
+import SymbolImpl from 'SymbolImpl';
 
 export class Event {
 
