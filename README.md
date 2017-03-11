@@ -89,7 +89,7 @@ dispatcher.dispatchEvent('eventType');
   
 Example available in project's `example` folder. To try example first run server
 ```javascript
-npm server
+npm run server
 ```
 And then go to [http://localhost:8081/example/index.html](http://localhost:8081/example/index.html)
 
