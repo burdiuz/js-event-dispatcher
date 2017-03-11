@@ -2,7 +2,7 @@
   "name": "event-dispatcher",
   "description": "EventDispatcher is a JavaScript class that adds events support to custom objects",
   "version": "0.0.4",
-  "main": "dist/event-dispatcher.min.js",
+  "main": "dist/event-dispatcher.js",
   "keywords": [
     "events",
     "object",
@@ -22,26 +22,33 @@
     "type": "git",
     "url": "https://github.com/burdiuz/js-event-dispatcher.git"
   },
-  "dependencies": {},
+  "dependencies": {
+    "SymbolImpl": "https://gist.github.com/burdiuz/7664491eed84695250e46be20670be84"
+  },
   "devDependencies": {
+    "babel-core": "^6.22.1",
+    "babel-loader": "^6.2.10",
+    "babel-plugin-istanbul": "^4.0.0",
+    "babel-preset-latest": "^6.22.0",
+    "babel-preset-stage-0": "^6.22.0",
     "chai": "^3.5.0",
-    "express": "^4.13.3",
-    "gulp": "^3.9.0",
-    "gulp-include": "^2.1.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-uglify": "^1.5.1",
+    "eslint": "^3.14.1",
+    "flow": "^0.2.3",
     "karma": "^0.13.16",
-    "karma-coverage": "^0.5.3",
+    "karma-coverage": "^1.1.1",
     "karma-coveralls": "^1.1.2",
-    "karma-mocha": "^0.2.1",
-    "karma-firefox-launcher": "^0.1.7",
-    "karma-sinon-chai": "^1.1.0",
-    "lolex": "^1.4.0",
+    "karma-firefox-launcher": "^0",
+    "karma-mocha": "^0.2.2",
+    "karma-sinon-chai": "^1.2.4",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^2.0.2",
     "mocha": "^2.4.5",
     "sinon": "^1.17.3",
-    "sinon-chai": "^2.8.0"
+    "sinon-chai": "^2.8.0",
+    "webpack": "^2.2.1"
   },
   "scripts": {
+    "start": "webpack",
     "test": "./node_modules/.bin/karma start --single-run --browsers Firefox karma.conf.js"
   }
 }
