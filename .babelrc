@@ -1,3 +1,9 @@
 {
-	"presets": ["stage-0", "latest"]
+  "presets": [
+    "stage-0",
+    "latest"
+  ],
+  "plugins": [
+    "istanbul"
+  ]
 }
