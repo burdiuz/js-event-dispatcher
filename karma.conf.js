@@ -32,7 +32,12 @@ module.exports = (config) => {
       }
     },
     plugins: [
-      require('karma-webpack')
+      require('karma-webpack'),
+	  'karma-coverage',
+	  'karma-coveralls',
+      'karma-firefox-launcher',
+      'karma-mocha',
+      'karma-sinon-chai',
     ],
     port: 9876,
     colors: true,
