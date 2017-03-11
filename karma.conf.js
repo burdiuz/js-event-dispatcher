@@ -17,18 +17,13 @@ module.exports = (config) => {
       type: 'lcov',
       dir: 'coverage/'
     },
-    webpack: {
-      loaders: [
-        {
-          test: /\.js$/,
-          loader: 'babel-loader'
-        }
-      ]
+	webpack: {
     },
     webpackMiddleware: {
       noInfo: true,
       stats: {
-        chunks: false
+        chunks: false,
+        colors: true
       }
     },
     plugins: [
