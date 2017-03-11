@@ -1,5 +1,6 @@
 'use strict';
 
-import EventDispatcher from './EventDispatcher';
+import EventDispatcher, { Event } from './EventDispatcher';
 
 export default EventDispatcher;
+export { EventDispatcher, Event };

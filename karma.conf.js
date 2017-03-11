@@ -25,7 +25,7 @@ module.exports = (config) => {
         loaders: [
           {
             test: /\.js$/,
-            loader: 'babel-loader'
+            loader: 'babel-loader?plugins[]=istanbul',
           }
         ]
       },

@@ -6,7 +6,9 @@
 Just another EventDispatcher/[EventTarget](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget) implementation.
 
 ## Installation
-Easy to install with [bower](http://bower.io/) or [npm](https://www.npmjs.com/) package managers, by adding this repository to dependencies
+`Note: Version 1.0.5 dropped bower support`  
+
+Easy to install with [npm](https://www.npmjs.com/) package manager, by adding this repository to dependencies
 ```javascript
 "dependencies": {
   "event-dispatcher": "git://github.com/burdiuz/js-event-dispatcher.git"
@@ -14,26 +16,28 @@ Easy to install with [bower](http://bower.io/) or [npm](https://www.npmjs.com/) 
 ```
 
 ## Usage
+`Note: In browser you have to use EventDispatcher.default path to get access to EventDispatcher class, because its exported as ES2015 module`  
 
 EventDispatcher distribution package is wrapped into UMD wrapper, so it can be used with any AMD module loader, nodejs `require()` or without any.
 To start using EventDispatcher, just instantiate it on its own
 ```javascript
-function MyClass() {
-  var _dispatcher = new EventDispatcher();
-  this.addEventListener = _dispatcher.addEventListener;
-  this.hasEventListener = _dispatcher.hasEventListener;
-  this.removeEventListener = _dispatcher.removeEventListener;
-  this.doSomething = function() {
-	  _dispatcher.dispatchEvent('didSomething');
+class MyClass {
+  constructor() {
+    this._dispatcher = new EventDispatcher();
+  }
+  addListener(handler) {
+    this._dispatcher.addEventListener('didSomething', handler);
+  }
+  doSomething() {
+	  this._dispatcher.dispatchEvent('didSomething');
   }
 }
 ```
-or `apply()` to your "class" function, to obtain EventDispatcher functionality
-```javascript 
-function MyClass() {
-  EventDispatcher.apply(this);
-  this.doSomething = function() {
-	  this.dispatchEvent('didSomething');
+extend it with your class
+```javascript
+class MyClass extends EventDispatcher {
+  doSomething() {
+    this.dispatchEvent('didSomething');
   }
 }
 ```
@@ -41,14 +45,14 @@ After instantiating `MyClass`, every call of `doSomething()` will fire event `di
 ```javascript
 var myObj = new MyClass();
 myObj.addEventListener('didSomething', function(event) {
-	console.log('My Listener', event.type);
+  console.log('My Listener', event.type);
 });
 myObj.doSomething();
 ```
 When adding listeners they will be executed in same order as they where added. To change order you can use optional `priority` argument to `addEventListener()` method.
 ```javascript
 myObj.addEventListener('didSomething', function(event) {
-	console.log('Prioritized Listener', event.type);
+  console.log('Prioritized Listener', event.type);
 }, 1);
 myObj.doSomething();
 ```
@@ -63,7 +67,7 @@ dispatcher.dispatchEvent('eventType');
 With event type you can specify any data, as second argument, that should be passed with event
 ```javascript
 dispatcher.addEventListener('eventType', function(event) {
-	console.log('My Listener', event.type, event.data);
+  console.log('My Listener', event.type, event.data);
 });
 dispatcher.dispatchEvent('eventType', {myData: 'something'});
 ```
@@ -75,8 +79,8 @@ dispatcher.dispatchEvent({type: 'eventType', data: 'data is optional'});
 If you want full control of events that fire from your EventDispatcher, you can specify event pre-processor function that will be called for each event before it fired. This function should return same or new event object.
 ```javascript
 function eventPreprocessor(event){
-	event.data = event.data || {};
-	return event;
+  event.data = event.data || {};
+  return event;
 }
 var dispatcher = new EventDispatcher(eventPreprocessor);
 dispatcher.dispatchEvent('eventType');
@@ -85,7 +89,7 @@ dispatcher.dispatchEvent('eventType');
   
 Example available in project's `example` folder. To try example first run server
 ```javascript
-node server
+npm server
 ```
 And then go to [http://localhost:8081/example/index.html](http://localhost:8081/example/index.html)
 
