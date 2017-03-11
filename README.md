@@ -16,7 +16,7 @@ Easy to install with [npm](https://www.npmjs.com/) package manager, by adding th
 ```
 
 ## Usage
-`Note: In browser you have to use EventDispatcher.default path to get access to EventDispatcher class, because its exported as ES2015 module`  
+`Note: When used directly in browser you have to use "EventDispatcher.default" path to get access to EventDispatcher class, because its exported as ES2015 module`  
 
 EventDispatcher distribution package is wrapped into UMD wrapper, so it can be used with any AMD module loader, nodejs `require()` or without any.
 To start using EventDispatcher, just instantiate it on its own
