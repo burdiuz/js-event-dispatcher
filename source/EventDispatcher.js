@@ -2,6 +2,8 @@
  * Created by Oleg Galaburda on 09.02.16.
  */
 
+'use strict';
+
 import SymbolImpl from 'SymbolImpl';
 
 export class Event {
@@ -10,6 +12,8 @@ export class Event {
     this.type = type;
     this.data = data || null;
     this.defaultPrevented = false;
+	this.stopPropagation;
+	this.stopImmediatePropagation;
   }
 
   toJSON() {
@@ -23,15 +27,6 @@ export class Event {
   preventDefault() {
     this.defaultPrevented = true;
   }
-
-  stopPropagation() {
-    // dummy
-  }
-
-  stopImmediatePropagation() {
-    // dummy
-  }
-
 }
 
 class EventListeners {
@@ -154,7 +149,7 @@ export class EventDispatcher {
    * @private
    */
   initialize(eventPreprocessor) {
-    this[PREPROCESSOR_FIELD] = eventPreprocessor;
+	this[PREPROCESSOR_FIELD] = eventPreprocessor;
     this[LISTENERS_FIELD] = new EventListeners();
   }
 

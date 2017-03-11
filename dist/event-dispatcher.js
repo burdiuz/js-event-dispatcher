@@ -81,6 +81,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/**
+ * Created by Oleg Galaburda on 09.02.16.
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -90,9 +94,7 @@ exports.EventDispatcher = exports.Event = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Created by Oleg Galaburda on 09.02.16.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _SymbolImpl = __webpack_require__(1);
 
@@ -109,6 +111,8 @@ var Event = exports.Event = function () {
     this.type = type;
     this.data = data || null;
     this.defaultPrevented = false;
+    this.stopPropagation;
+    this.stopImmediatePropagation;
   }
 
   _createClass(Event, [{
@@ -125,16 +129,6 @@ var Event = exports.Event = function () {
     key: 'preventDefault',
     value: function preventDefault() {
       this.defaultPrevented = true;
-    }
-  }, {
-    key: 'stopPropagation',
-    value: function stopPropagation() {
-      // dummy
-    }
-  }, {
-    key: 'stopImmediatePropagation',
-    value: function stopImmediatePropagation() {
-      // dummy
     }
   }]);
 

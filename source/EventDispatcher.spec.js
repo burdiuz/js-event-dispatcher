@@ -1,6 +1,11 @@
 /**
  * Created by Oleg Galaburda on 09.02.16.
  */
+
+'use strict';
+
+import EventDispatcher, { Event } from './EventDispatcher';
+
 describe('EventDispatcher', () => {
 
   describe('isObject', () => {
@@ -21,7 +26,7 @@ describe('EventDispatcher', () => {
   describe('getEvent', () => {
 
     describe('When event type passed', () => {
-      var event = null;
+      let event = null;
       beforeEach(() => {
         event = EventDispatcher.getEvent('event-type');
       });
@@ -34,7 +39,7 @@ describe('EventDispatcher', () => {
     });
 
     describe('When event type with data passed', () => {
-      var event = null;
+      let event = null;
       beforeEach(() => {
         event = EventDispatcher.getEvent('event-type', 'some data');
       });
@@ -44,7 +49,7 @@ describe('EventDispatcher', () => {
     });
 
     describe('When event type is\'n a string', () => {
-      var event = null;
+      let event = null;
       beforeEach(() => {
         event = EventDispatcher.getEvent(256);
       });
@@ -54,19 +59,19 @@ describe('EventDispatcher', () => {
     });
 
     describe('When event object passed', () => {
-      var event = null;
+      let event = null;
       beforeEach(() => {
-        event = EventDispatcher.getEvent({type: 'event-type', data: 'some data', value: 'some-value'});
+        event = EventDispatcher.getEvent({ type: 'event-type', data: 'some data', value: 'some-value' });
       });
       it('should keep event object unchanged', () => {
-        expect(event).to.be.eql({type: 'event-type', data: 'some data', value: 'some-value'});
+        expect(event).to.be.eql({ type: 'event-type', data: 'some data', value: 'some-value' });
       });
     });
 
     describe('When event object and data passed', () => {
-      var event = null;
+      let event = null;
       beforeEach(() => {
-        event = EventDispatcher.getEvent({type: 'event-type', data: 'some data'}, 'another-data');
+        event = EventDispatcher.getEvent({ type: 'event-type', data: 'some data' }, 'another-data');
       });
       it('should ignore passed data', () => {
         expect(event.data).to.be.equal('some data');
@@ -81,21 +86,43 @@ describe('EventDispatcher', () => {
     });
   });
 
-  describe('createNoInitPrototype()', () => {
+  describe('create with noInit = false', () => {
+    let spy;
+    beforeEach(() => {
+      spy = sinon.spy(EventDispatcher.prototype, 'initialize');
+      new EventDispatcher(null, false);
+    });
+    afterEach(() => {
+      spy.restore();
+    });
     it('should result in EventDispatcher instance', () => {
-      expect(EventDispatcher.createNoInitPrototype()).to.be.an.instanceof(EventDispatcher);
+      expect(spy).to.be.calledOnce;
+    });
+  });
+
+  describe('create with noInit = true', () => {
+    let spy;
+    beforeEach(() => {
+      spy = sinon.spy(EventDispatcher.prototype, 'initialize');
+      new EventDispatcher(null, true);
+    });
+    afterEach(() => {
+      spy.restore();
+    });
+    it('should result in EventDispatcher instance', () => {
+      expect(spy).to.not.been.called;
     });
   });
 
   describe('Instance', () => {
-    var dispatcher = null;
-    var handlerA = null;
-    var handlerAA = null;
-    var handlerAAA = null;
-    var handlerA1 = null;
-    var handlerA_1 = null;
-    var handlerB = null;
-    var handlerC = null;
+    let dispatcher = null;
+    let handlerA = null;
+    let handlerAA = null;
+    let handlerAAA = null;
+    let handlerA1 = null;
+    let handlerA_1 = null;
+    let handlerB = null;
+    let handlerC = null;
     beforeEach(() => {
       handlerA = sinon.spy();
       handlerAA = sinon.spy();
@@ -108,10 +135,10 @@ describe('EventDispatcher', () => {
     });
 
     describe('When created with preprocessor', () => {
-      var preprocessor, listener, dispatcher;
+      let preprocessor, listener, dispatcher;
       beforeEach(() => {
-        preprocessor = sinon.spy(function(event) {
-          return {type: event.type, data: 'processed'};
+        preprocessor = sinon.spy((event) => {
+          return { type: event.type, data: 'processed' };
         });
         dispatcher = new EventDispatcher(preprocessor);
         listener = sinon.spy();
@@ -126,11 +153,11 @@ describe('EventDispatcher', () => {
           expect(preprocessor).to.be.calledOnce;
         });
         it('preprocessor should receive one argument', () => {
-          var args = preprocessor.getCall(0).args;
+          const args = preprocessor.getCall(0).args;
           expect(args).to.have.length(1);
         });
         it('preprocessor should receive event object', () => {
-          var event = preprocessor.getCall(0).args[0];
+          const event = preprocessor.getCall(0).args[0];
           expect(event.type).to.be.equal('event');
           expect(event.data).to.be.equal('anything');
         });
@@ -138,21 +165,21 @@ describe('EventDispatcher', () => {
           expect(preprocessor).to.be.calledOn(dispatcher);
         });
         it('listener should receive processed event', () => {
-          var event = listener.getCall(0).args[0];
+          const event = listener.getCall(0).args[0];
           expect(event.data).to.be.equal('processed');
         });
       });
 
       describe('When dispatch by event object', () => {
         beforeEach(() => {
-          dispatcher.dispatchEvent({type: 'event', data: 'anything'});
+          dispatcher.dispatchEvent({ type: 'event', data: 'anything' });
         });
         it('preprocessor should receive event object', () => {
-          var event = preprocessor.getCall(0).args[0];
-          expect(event).to.be.eql({type: 'event', data: 'anything'});
+          const event = preprocessor.getCall(0).args[0];
+          expect(event).to.be.eql({ type: 'event', data: 'anything' });
         });
         it('listener should receive processed event', () => {
-          var event = listener.getCall(0).args[0];
+          const event = listener.getCall(0).args[0];
           expect(event.data).to.be.equal('processed');
         });
       });
@@ -230,7 +257,7 @@ describe('EventDispatcher', () => {
           expect(handlerA).to.have.been.calledOnce;
         });
         it('should create Event object', () => {
-          var arg = handlerA.getCall(0).args[0];
+          const arg = handlerA.getCall(0).args[0];
           expect(arg).to.be.an.instanceof(EventDispatcher.Event);
           expect(arg.type).to.be.equal('eventA');
           expect(arg.data).to.be.null;
@@ -243,13 +270,13 @@ describe('EventDispatcher', () => {
           dispatcher.dispatchEvent('eventB', ['any-data', 3]);
         });
         it('should store data', () => {
-          var arg = handlerB.getCall(0).args[0];
+          const arg = handlerB.getCall(0).args[0];
           expect(arg.data).to.be.eql(['any-data', 3]);
         });
       });
 
       describe('When using Event instance', () => {
-        var event = null;
+        let event = null;
         beforeEach(() => {
           event = new Event('eventC');
           dispatcher.addEventListener('eventC', handlerC);
@@ -261,9 +288,9 @@ describe('EventDispatcher', () => {
       });
 
       describe('When using event object literal', () => {
-        var event = null;
+        let event = null;
         beforeEach(() => {
-          event = {type: 'eventC', data: 1234, bubble: false};
+          event = { type: 'eventC', data: 1234, bubble: false };
           dispatcher.addEventListener('eventC', handlerC);
           dispatcher.dispatchEvent(event);
         });
@@ -271,8 +298,8 @@ describe('EventDispatcher', () => {
           expect(handlerC).to.be.calledWith(event);
         });
         it('should keep event unchanged', () => {
-          var arg = handlerC.getCall(0).args[0];
-          expect(arg).to.be.eql({type: 'eventC', data: 1234, bubble: false});
+          const arg = handlerC.getCall(0).args[0];
+          expect(arg).to.be.eql({ type: 'eventC', data: 1234, bubble: false });
         });
       });
 
@@ -283,7 +310,7 @@ describe('EventDispatcher', () => {
       });
 
       describe('When using multiple listeners', () => {
-        var stack = null;
+        let stack = null;
         beforeEach(() => {
           stack = [];
           dispatcher.addEventListener('eventA', () => {
@@ -303,7 +330,7 @@ describe('EventDispatcher', () => {
       });
 
       describe('When using priorities', () => {
-        var stack = null;
+        let stack = null;
         beforeEach(() => {
           stack = [];
           dispatcher.addEventListener('eventA', () => {
@@ -332,7 +359,7 @@ describe('EventDispatcher', () => {
       describe('When stopping propagation', () => {
         beforeEach(() => {
           dispatcher.addEventListener('eventA', handlerA);
-          dispatcher.addEventListener('eventA', function(event) {
+          dispatcher.addEventListener('eventA', (event) => {
             event.stopPropagation();
           });
           dispatcher.addEventListener('eventA', handlerAA);
@@ -353,7 +380,7 @@ describe('EventDispatcher', () => {
       describe('When stopping immediate propagation', () => {
         beforeEach(() => {
           dispatcher.addEventListener('eventA', handlerA);
-          dispatcher.addEventListener('eventA', function(event) {
+          dispatcher.addEventListener('eventA', (event) => {
             event.stopImmediatePropagation();
           });
           dispatcher.addEventListener('eventA', handlerAA);

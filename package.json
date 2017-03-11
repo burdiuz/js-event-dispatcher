@@ -39,6 +39,7 @@
     "karma-firefox-launcher": "^0",
     "karma-mocha": "^0.2.2",
     "karma-sinon-chai": "^1.2.4",
+    "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.2",
     "mocha": "^2.4.5",
     "sinon": "^1.17.3",
@@ -46,6 +47,7 @@
     "webpack": "^2.2.1"
   },
   "scripts": {
+    "start": "webpack",
     "test": "./node_modules/.bin/karma start --single-run --browsers Firefox karma.conf.js"
   }
 }

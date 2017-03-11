@@ -4,35 +4,49 @@ module.exports = (config) => {
     basePath: __dirname,
     frameworks: ['mocha', 'sinon-chai'],
     files: [
-      'source/**/*.js'
+      'source/**/*.spec.js',
     ],
     exclude: [],
 
     preprocessors: {
-      'source/**/!(*.spec).js': ['coverage', 'webpack'],
-      'source/**/*.spec.js': ['webpack'],
+      'source/**/!(*.spec).js': ['webpack', 'sourcemap', 'coverage'],
+      'source/**/*.spec.js': ['webpack', 'sourcemap'],
     },
     reporters: ['coverage', 'progress', 'coveralls'],
     coverageReporter: {
       type: 'lcov',
       dir: 'coverage/'
     },
-	webpack: {
+    webpack: {
+      resolve: {
+        extensions: ['.js']
+      },
+      module: {
+        loaders: [
+          {
+            test: /\.js$/,
+            loader: 'babel-loader'
+          }
+        ]
+      },
+      devtool: 'inline-source-map',
     },
     webpackMiddleware: {
       noInfo: true,
       stats: {
         chunks: false,
         colors: true
-      }
+      },
+      stats: 'errors-only'
     },
     plugins: [
       require('karma-webpack'),
-	  'karma-coverage',
-	  'karma-coveralls',
-      'karma-firefox-launcher',
-      'karma-mocha',
-      'karma-sinon-chai',
+      require('karma-coverage'),
+      require('karma-coveralls'),
+      require('karma-firefox-launcher'),
+      require('karma-sourcemap-loader'),
+      require('karma-mocha'),
+      require('karma-sinon-chai'),
     ],
     port: 9876,
     colors: true,
@@ -41,7 +55,7 @@ module.exports = (config) => {
     logLevel: config.LOG_INFO,
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: true,
-    browsers: ['Chrome'],
+    browsers: ['Firefox'],
     //browsers: ['Chrome', 'IE', 'Firefox'],
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
