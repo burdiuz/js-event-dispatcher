@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "http://localhost:8081/dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -83,6 +83,7 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 /**
  * Created by Oleg Galaburda on 09.02.16.
+ * 
  */
 
 
@@ -90,17 +91,10 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.EventDispatcher = exports.Event = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _SymbolImpl = __webpack_require__(1);
-
-var _SymbolImpl2 = _interopRequireDefault(_SymbolImpl);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -152,25 +146,36 @@ var EventListeners = function () {
 
   _createClass(EventListeners, [{
     key: 'createList',
-    value: function createList(eventType, priority, target) {
-      var priorities = this.getHashByKey(eventType, target, Object);
-      return this.getHashByKey(parseInt(priority), priorities, Array);
+    value: function createList(eventType, priority) {
+      return this.getListenersListByKey(parseInt(priority), this.getPrioritiesByKey(eventType));
     }
   }, {
-    key: 'getHashByKey',
-    value: function getHashByKey(key, target, definition) {
-      var value = null;
+    key: 'getPrioritiesByKey',
+    value: function getPrioritiesByKey(key) {
+      var value = void 0;
+      if (this._listeners.hasOwnProperty(key)) {
+        value = this._listeners[key];
+      } else {
+        value = this._listeners[key] = {};
+      }
+      return value;
+    }
+  }, {
+    key: 'getListenersListByKey',
+    value: function getListenersListByKey(priority, target) {
+      var key = String(priority);
+      var value = void 0;
       if (target.hasOwnProperty(key)) {
         value = target[key];
-      } else if (definition) {
-        value = target[key] = new definition();
+      } else {
+        value = target[key] = [];
       }
       return value;
     }
   }, {
     key: 'add',
     value: function add(eventType, handler, priority) {
-      var handlers = this.createList(eventType, priority, this._listeners);
+      var handlers = this.createList(eventType, priority);
       if (handlers.indexOf(handler) < 0) {
         handlers.push(handler);
       }
@@ -179,10 +184,10 @@ var EventListeners = function () {
     key: 'has',
     value: function has(eventType) {
       var result = false;
-      var priorities = this.getHashByKey(eventType, this._listeners);
+      var priorities = this.getPrioritiesByKey(eventType);
       if (priorities) {
-        for (var priority in priorities) {
-          if (priorities.hasOwnProperty(priority)) {
+        for (var _priority in priorities) {
+          if (priorities.hasOwnProperty(_priority)) {
             result = true;
             break;
           }
@@ -193,18 +198,18 @@ var EventListeners = function () {
   }, {
     key: 'remove',
     value: function remove(eventType, handler) {
-      var priorities = this.getHashByKey(eventType, this._listeners);
+      var priorities = this.getPrioritiesByKey(eventType);
       if (priorities) {
         var list = Object.getOwnPropertyNames(priorities);
         var length = list.length;
         for (var index = 0; index < length; index++) {
-          var priority = list[index];
-          var handlers = priorities[priority];
+          var _priority2 = list[index];
+          var handlers = priorities[_priority2];
           var handlerIndex = handlers.indexOf(handler);
           if (handlerIndex >= 0) {
             handlers.splice(handlerIndex, 1);
             if (!handlers.length) {
-              delete priorities[priority];
+              delete priorities[_priority2];
             }
           }
         }
@@ -228,8 +233,9 @@ var EventListeners = function () {
       };
       event.stopPropagation = stopPropagation;
       event.stopImmediatePropagation = stopImmediatePropagation;
-      var priorities = this.getHashByKey(event.type, this._listeners);
+      var priorities = this.getPrioritiesByKey(event.type, this._listeners);
       if (priorities) {
+        // getOwnPropertyNames() or keys()?
         var list = Object.getOwnPropertyNames(priorities).sort(function (a, b) {
           return a - b;
         });
@@ -254,9 +260,6 @@ var EventListeners = function () {
   return EventListeners;
 }();
 
-var LISTENERS_FIELD = (0, _SymbolImpl2.default)('event.dispatcher::listeners');
-var PREPROCESSOR_FIELD = (0, _SymbolImpl2.default)('event.dispatcher::preprocessor');
-
 var EventDispatcher = exports.EventDispatcher = function () {
   function EventDispatcher(eventPreprocessor) {
     var noInit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -276,37 +279,39 @@ var EventDispatcher = exports.EventDispatcher = function () {
   _createClass(EventDispatcher, [{
     key: 'initialize',
     value: function initialize(eventPreprocessor) {
-      this[PREPROCESSOR_FIELD] = eventPreprocessor;
-      this[LISTENERS_FIELD] = new EventListeners();
+      this._eventPreprocessor = eventPreprocessor;
+      this._listeners = new EventListeners();
     }
   }, {
     key: 'addEventListener',
-    value: function addEventListener(eventType, listener, priority) {
-      this[LISTENERS_FIELD].add(eventType, listener, -priority || 0);
+    value: function addEventListener(eventType, listener) {
+      var priority = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
+      this._listeners.add(eventType, listener, -priority || 0);
     }
   }, {
     key: 'hasEventListener',
     value: function hasEventListener(eventType) {
-      return this[LISTENERS_FIELD].has(eventType);
+      return this._listeners.has(eventType);
     }
   }, {
     key: 'removeEventListener',
     value: function removeEventListener(eventType, listener) {
-      this[LISTENERS_FIELD].remove(eventType, listener);
+      this._listeners.remove(eventType, listener);
     }
   }, {
     key: 'removeAllEventListeners',
     value: function removeAllEventListeners(eventType) {
-      this[LISTENERS_FIELD].removeAll(eventType);
+      this._listeners.removeAll(eventType);
     }
   }, {
     key: 'dispatchEvent',
     value: function dispatchEvent(event, data) {
       var eventObject = EventDispatcher.getEvent(event, data);
-      if (this[PREPROCESSOR_FIELD]) {
-        eventObject = this[PREPROCESSOR_FIELD].call(this, eventObject);
+      if (this._eventPreprocessor) {
+        eventObject = this._eventPreprocessor.call(this, eventObject);
       }
-      this[LISTENERS_FIELD].call(eventObject);
+      this._listeners.call(eventObject);
     }
   }], [{
     key: 'isObject',
@@ -344,31 +349,9 @@ exports.default = EventDispatcher;
 
 
 Object.defineProperty(exports, "__esModule", {
-		value: true
+  value: true
 });
-var SymbolImpl = void 0;
-
-if (typeof Symbol === 'undefined') {
-		SymbolImpl = function SymbolImpl(value) {
-				var symbol = function symbol() {
-						return '@@' + value + ':' + Math.random();
-				};
-				symbol.toString = symbol;
-				symbol.valueOf = symbol;
-				return symbol;
-		};
-} else {
-		SymbolImpl = Symbol;
-}
-
-exports.default = SymbolImpl;
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
+exports.Event = exports.EventDispatcher = undefined;
 
 var _EventDispatcher = __webpack_require__(0);
 
@@ -376,12 +359,9 @@ var _EventDispatcher2 = _interopRequireDefault(_EventDispatcher);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-module.exports = _EventDispatcher2.default;
-
-/*
-export default EventDispatcher;
-export { EventDispatcher, Event };
-*/
+exports.default = _EventDispatcher2.default;
+exports.EventDispatcher = _EventDispatcher2.default;
+exports.Event = _EventDispatcher.Event;
 
 /***/ })
 /******/ ]);

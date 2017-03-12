@@ -23,16 +23,16 @@
     "url": "https://github.com/burdiuz/js-event-dispatcher.git"
   },
   "dependencies": {
-    "SymbolImpl": "https://gist.github.com/burdiuz/7664491eed84695250e46be20670be84"
   },
   "devDependencies": {
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",
     "babel-plugin-istanbul": "^4.0.0",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-preset-latest": "^6.22.0",
     "chai": "^3.5.0",
     "eslint": "^3.14.1",
-    "flow": "^0.2.3",
+    "flow-bin": "^0.41.0",
     "karma": "^0.13.16",
     "karma-coverage": "^1.1.1",
     "karma-coveralls": "^1.1.2",
@@ -49,6 +49,8 @@
   },
   "scripts": {
     "start": "webpack",
+    "lint": "./node_modules/.bin/eslint",
+    "flow": "./node_modules/.bin/flow",
     "server": "./node_modules/.bin/webpack-dev-server --port 8081 --config webpack.config.main.js --open",
     "test": "./node_modules/.bin/karma start --single-run --browsers Firefox karma.conf.js"
   }

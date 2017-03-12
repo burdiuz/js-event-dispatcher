@@ -1,9 +1,5 @@
 const webpack = require('webpack');
-const path = require('path');
-
-const p = (value) => {
-  return path.resolve(__dirname, value);
-};
+const { p } = require('./webpack.helpers');
 
 module.exports = {
   context: __dirname,

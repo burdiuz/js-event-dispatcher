@@ -1,26 +1,33 @@
 /**
  * Created by Oleg Galaburda on 09.02.16.
+ * @flow
  */
 
 'use strict';
 
-import SymbolImpl from 'SymbolImpl';
+import type { EventObject, EventType, EventListener, EventProcessor } from './TypeDefinition';
 
 export class Event {
 
-  constructor(type, data) {
+  type: string;
+  data: mixed;
+  defaultPrevented: boolean;
+  stopPropagation: ?Function;
+  stopImmediatePropagation: ?Function;
+
+  constructor(type: string, data: mixed) {
     this.type = type;
     this.data = data || null;
     this.defaultPrevented = false;
-	this.stopPropagation;
-	this.stopImmediatePropagation;
+    this.stopPropagation;
+    this.stopImmediatePropagation;
   }
 
-  toJSON() {
+  toJSON(): EventObject {
     return { type: this.type, data: this.data };
   }
 
-  isDefaultPrevented() {
+  isDefaultPrevented(): boolean {
     return this.defaultPrevented;
   }
 
@@ -29,7 +36,17 @@ export class Event {
   }
 }
 
+type EventTypesCollection = {
+  [eventType:string]: EventPrioritiesCollection;
+}
+
+type EventPrioritiesCollection = {
+  [priority:string]: Array<EventListener>;
+}
+
 class EventListeners {
+
+  _listeners: EventTypesCollection;
 
   constructor() {
     /**
@@ -43,31 +60,44 @@ class EventListeners {
     this._listeners = {};
   }
 
-  createList(eventType, priority, target) {
-    const priorities = this.getHashByKey(eventType, target, Object);
-    return this.getHashByKey(parseInt(priority), priorities, Array);
+  createList(eventType: string, priority: number): Array<EventListener> {
+    return this.getListenersListByKey(
+      parseInt(priority),
+      this.getPrioritiesByKey(eventType)
+    );
   }
 
-  getHashByKey(key, target, definition) {
-    let value = null;
-    if (target.hasOwnProperty(key)) {
-      value = target[key];
-    } else if (definition) {
-      value = target[key] = new definition();
+  getPrioritiesByKey(key: string): EventPrioritiesCollection {
+    let value: EventPrioritiesCollection;
+    if (this._listeners.hasOwnProperty(key)) {
+      value = this._listeners[key];
+    } else {
+      value = this._listeners[key] = {};
     }
     return value;
   }
 
-  add(eventType, handler, priority) {
-    const handlers = this.createList(eventType, priority, this._listeners);
+  getListenersListByKey(priority: number, target: EventPrioritiesCollection): Array<EventListener> {
+    const key: string = String(priority);
+    let value: Array<EventListener>;
+    if (target.hasOwnProperty(key)) {
+      value = target[key];
+    } else {
+      value = target[key] = [];
+    }
+    return value;
+  }
+
+  add(eventType: string, handler: EventListener, priority: number) {
+    const handlers = this.createList(eventType, priority);
     if (handlers.indexOf(handler) < 0) {
       handlers.push(handler);
     }
   }
 
-  has(eventType) {
+  has(eventType: string): boolean {
     let result = false;
-    const priorities = this.getHashByKey(eventType, this._listeners);
+    const priorities = this.getPrioritiesByKey(eventType);
     if (priorities) {
       for (let priority in priorities) {
         if (priorities.hasOwnProperty(priority)) {
@@ -79,8 +109,8 @@ class EventListeners {
     return result;
   }
 
-  remove(eventType, handler) {
-    const priorities = this.getHashByKey(eventType, this._listeners);
+  remove(eventType: string, handler) {
+    const priorities = this.getPrioritiesByKey(eventType);
     if (priorities) {
       const list = Object.getOwnPropertyNames(priorities);
       const length = list.length;
@@ -98,11 +128,11 @@ class EventListeners {
     }
   }
 
-  removeAll(eventType) {
+  removeAll(eventType: string) {
     delete this._listeners[eventType];
   }
 
-  call(event, target) {
+  call(event: EventObject, target: any) {
     let _stopped = false;
     let _immediatelyStopped = false;
     const stopPropagation = () => {
@@ -113,17 +143,20 @@ class EventListeners {
     };
     event.stopPropagation = stopPropagation;
     event.stopImmediatePropagation = stopImmediatePropagation;
-    const priorities = this.getHashByKey(event.type, this._listeners);
+    const priorities = this.getPrioritiesByKey(event.type, this._listeners);
     if (priorities) {
-      const list = Object.getOwnPropertyNames(priorities).sort((a, b) => (a - b));
+      // getOwnPropertyNames() or keys()?
+      const list: string[] = Object.getOwnPropertyNames(priorities).sort(
+        (a: any, b: any) => (a - b)
+      );
       const length = list.length;
       for (let index = 0; index < length; index++) {
         if (_stopped) break;
-        const handlers = priorities[list[index]];
+        const handlers: Array<EventListener> = priorities[list[index]];
         const handlersLength = handlers.length;
         for (let handlersIndex = 0; handlersIndex < handlersLength; handlersIndex++) {
           if (_immediatelyStopped) break;
-          let handler = handlers[handlersIndex];
+          let handler: EventListener = handlers[handlersIndex];
           // FIXME why "handler" sometimes undefined?
           handler && handler.call(target, event);
         }
@@ -134,12 +167,12 @@ class EventListeners {
   }
 }
 
-const LISTENERS_FIELD = SymbolImpl('event.dispatcher::listeners');
-const PREPROCESSOR_FIELD = SymbolImpl('event.dispatcher::preprocessor');
-
 export class EventDispatcher {
 
-  constructor(eventPreprocessor, noInit = false) {
+  _listeners: EventListeners;
+  _eventPreprocessor: EventProcessor;
+
+  constructor(eventPreprocessor: EventProcessor, noInit: boolean = false) {
     if (!noInit) {
       this.initialize(eventPreprocessor);
     }
@@ -148,50 +181,52 @@ export class EventDispatcher {
   /**
    * @private
    */
-  initialize(eventPreprocessor) {
-	this[PREPROCESSOR_FIELD] = eventPreprocessor;
-    this[LISTENERS_FIELD] = new EventListeners();
+  initialize(eventPreprocessor: EventProcessor) {
+    this._eventPreprocessor = eventPreprocessor;
+    this._listeners = new EventListeners();
   }
 
-  addEventListener(eventType, listener, priority) {
-    this[LISTENERS_FIELD].add(eventType, listener, -priority || 0);
+  addEventListener(eventType: string, listener: EventListener, priority: number = 0) {
+    this._listeners.add(eventType, listener, -priority || 0);
   }
 
-  hasEventListener(eventType) {
-    return this[LISTENERS_FIELD].has(eventType);
+  hasEventListener(eventType: string) {
+    return this._listeners.has(eventType);
   }
 
-  removeEventListener(eventType, listener) {
-    this[LISTENERS_FIELD].remove(eventType, listener);
+  removeEventListener(eventType: string, listener: EventListener) {
+    this._listeners.remove(eventType, listener);
   }
 
-  removeAllEventListeners(eventType) {
-    this[LISTENERS_FIELD].removeAll(eventType);
+  removeAllEventListeners(eventType: string) {
+    this._listeners.removeAll(eventType);
   }
 
-  dispatchEvent(event, data) {
+  dispatchEvent(event: EventType, data: mixed) {
     var eventObject = EventDispatcher.getEvent(event, data);
-    if (this[PREPROCESSOR_FIELD]) {
-      eventObject = this[PREPROCESSOR_FIELD].call(this, eventObject);
+    if (this._eventPreprocessor) {
+      eventObject = this._eventPreprocessor.call(this, eventObject);
     }
-    this[LISTENERS_FIELD].call(eventObject);
+    this._listeners.call(eventObject);
   }
 
-  static isObject(value) {
+  static isObject(value: mixed) {
     return (typeof value === 'object') && (value !== null);
   }
 
-  static getEvent(eventOrType, optionalData) {
+  static getEvent(eventOrType: EventType, optionalData: mixed): EventObject {
     let event = eventOrType;
     if (!EventDispatcher.isObject(eventOrType)) {
       event = new EventDispatcher.Event(String(eventOrType), optionalData);
     }
-    return event;
+    return (event:any);
   }
 
-  static create(eventPreprocessor) {
+  static create(eventPreprocessor: EventProcessor) {
     return new EventDispatcher(eventPreprocessor);
   }
+
+  static Event: Class<Event>;
 }
 
 EventDispatcher.Event = Event;

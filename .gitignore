@@ -8,6 +8,8 @@ bower_components/
 node_modules/
 coverage/
 
+*.log
+
 # Folder config file
 Desktop.ini
 
