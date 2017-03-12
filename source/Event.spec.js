@@ -4,7 +4,6 @@
 
 'use strict';
 
-import { expect } from 'chai';
 import EventDispatcher, { Event } from './EventDispatcher';
 
 describe('Event', () => {
