@@ -4,6 +4,8 @@
 
 'use strict';
 
+
+import { expect } from 'chai';
 import EventDispatcher, { Event } from './EventDispatcher';
 
 describe('EventDispatcher', () => {
@@ -258,7 +260,7 @@ describe('EventDispatcher', () => {
         });
         it('should create Event object', () => {
           const arg = handlerA.getCall(0).args[0];
-          expect(arg).to.be.an.instanceof(EventDispatcher.Event);
+          expect(arg).to.be.an.instanceof(Event);
           expect(arg.type).to.be.equal('eventA');
           expect(arg.data).to.be.null;
         });
@@ -397,7 +399,6 @@ describe('EventDispatcher', () => {
           expect(handlerA_1).to.not.be.called;
         });
       });
-
     });
   });
 });

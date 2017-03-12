@@ -3,8 +3,6 @@
  * @flow
  */
 
-'use strict';
-
 import type { EventObject, EventType, EventListener, EventProcessor } from './TypeDefinition';
 
 export class Event {
@@ -19,8 +17,6 @@ export class Event {
     this.type = type;
     this.data = data || null;
     this.defaultPrevented = false;
-    this.stopPropagation;
-    this.stopImmediatePropagation;
   }
 
   toJSON(): EventObject {
@@ -36,12 +32,12 @@ export class Event {
   }
 }
 
-type EventTypesCollection = {
-  [eventType:string]: EventPrioritiesCollection;
-}
-
 type EventPrioritiesCollection = {
   [priority:string]: Array<EventListener>;
+}
+
+type EventTypesCollection = {
+  [eventType:string]: EventPrioritiesCollection;
 }
 
 class EventListeners {
@@ -62,8 +58,8 @@ class EventListeners {
 
   createList(eventType: string, priority: number): Array<EventListener> {
     return this.getListenersListByKey(
-      parseInt(priority),
-      this.getPrioritiesByKey(eventType)
+      parseInt(priority, 10),
+      this.getPrioritiesByKey(eventType),
     );
   }
 
@@ -167,7 +163,7 @@ class EventListeners {
   }
 }
 
-export class EventDispatcher {
+class EventDispatcher {
 
   _listeners: EventListeners;
   _eventPreprocessor: EventProcessor;

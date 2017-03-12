@@ -4,14 +4,15 @@
 
 'use strict';
 
-import EventDispatcher, {Event} from './EventDispatcher';
+import { expect } from 'chai';
+import EventDispatcher, { Event } from './EventDispatcher';
 
 describe('Event', () => {
   var event = '';
   var data = '';
   var type = '';
   beforeEach(() => {
-    data = {value: false};
+    data = { value: false };
     type = 'someEventType';
     event = new Event(type, data);
   });
@@ -40,7 +41,7 @@ describe('Event', () => {
   describe('toJSON()', () => {
     it('should include only type and data', () => {
       expect(event.toJSON()).to.be.eql({
-        data: {value: false},
+        data: { value: false },
         type: 'someEventType'
       });
     });
