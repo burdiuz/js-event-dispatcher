@@ -91,20 +91,6 @@ npm run server
 ```
 And then go to [http://localhost:8081/example/index.html](http://localhost:8081/example/index.html)
 
-## Extending custom classes
-If you want to extend your classes with EventDispatcher functionality, I've prepared for this special method `EventDispatcher.createNoInitPrototype()`. Your classes can use its result as prototype.
-```javascript
-function MyClass(){
-  EventDispatcher.apply(this);
-}
-MyClass.prototype = EventDispatcher.createNoInitPrototype();
-MyClass.prototype.constructor = MyClass;
-
-var instance = new MyClass();
-console.log(instance instanceof EventDispatcher); // true
-```
-Instances of MyClass will be instances of EventDispatcher and each will have own listeners collection.
-  
 ## API
 
 ### EventDispatcher
