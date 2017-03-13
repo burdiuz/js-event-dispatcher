@@ -5,6 +5,10 @@
 
 import type { EventObject, EventType, EventListener, EventProcessor } from './TypeDefinition';
 
+const hasOwnProp = (target: any, name: string): boolean => (
+  Object.prototype.hasOwnProperty.call(target, name)
+);
+
 export class Event {
 
   type: string;
@@ -57,29 +61,26 @@ class EventListeners {
   }
 
   createList(eventType: string, priority: number): Array<EventListener> {
-    return this.getListenersListByKey(
-      parseInt(priority, 10),
-      this.getPrioritiesByKey(eventType),
-    );
-  }
-
-  getPrioritiesByKey(key: string): EventPrioritiesCollection {
-    let value: EventPrioritiesCollection;
-    if (this._listeners.hasOwnProperty(key)) {
-      value = this._listeners[key];
+    priority = parseInt(priority, 10);
+    const target: EventPrioritiesCollection = this.getPrioritiesByKey(eventType);
+    const key: string = String(priority);
+    let value: Array<EventListener>;
+    if (hasOwnProp(target, key)) {
+      value = target[key];
     } else {
-      value = this._listeners[key] = {};
+      value = [];
+      target[key] = value;
     }
     return value;
   }
 
-  getListenersListByKey(priority: number, target: EventPrioritiesCollection): Array<EventListener> {
-    const key: string = String(priority);
-    let value: Array<EventListener>;
-    if (target.hasOwnProperty(key)) {
-      value = target[key];
+  getPrioritiesByKey(key: string): EventPrioritiesCollection {
+    let value: EventPrioritiesCollection;
+    if (hasOwnProp(this._listeners, key)) {
+      value = this._listeners[key];
     } else {
-      value = target[key] = [];
+      value = {};
+      this._listeners[key] = value;
     }
     return value;
   }
@@ -92,11 +93,12 @@ class EventListeners {
   }
 
   has(eventType: string): boolean {
+    let priority: string;
     let result = false;
     const priorities = this.getPrioritiesByKey(eventType);
     if (priorities) {
-      for (let priority in priorities) {
-        if (priorities.hasOwnProperty(priority)) {
+      for (priority in priorities) {
+        if (hasOwnProp(priorities, priority)) {
           result = true;
           break;
         }
@@ -129,6 +131,7 @@ class EventListeners {
   }
 
   call(event: EventObject, target: any) {
+    let handler: EventListener;
     let _stopped = false;
     let _immediatelyStopped = false;
     const stopPropagation = () => {
@@ -143,7 +146,7 @@ class EventListeners {
     if (priorities) {
       // getOwnPropertyNames() or keys()?
       const list: string[] = Object.getOwnPropertyNames(priorities).sort(
-        (a: any, b: any) => (a - b)
+        (a: any, b: any) => (a - b),
       );
       const length = list.length;
       for (let index = 0; index < length; index++) {
@@ -152,9 +155,8 @@ class EventListeners {
         const handlersLength = handlers.length;
         for (let handlersIndex = 0; handlersIndex < handlersLength; handlersIndex++) {
           if (_immediatelyStopped) break;
-          let handler: EventListener = handlers[handlersIndex];
-          // FIXME why "handler" sometimes undefined?
-          handler && handler.call(target, event);
+          handler = handlers[handlersIndex];
+          handler.call(target, event);
         }
       }
     }
@@ -199,7 +201,7 @@ class EventDispatcher {
   }
 
   dispatchEvent(event: EventType, data: mixed) {
-    var eventObject = EventDispatcher.getEvent(event, data);
+    let eventObject = EventDispatcher.getEvent(event, data);
     if (this._eventPreprocessor) {
       eventObject = this._eventPreprocessor.call(this, eventObject);
     }
@@ -222,6 +224,7 @@ class EventDispatcher {
     return new EventDispatcher(eventPreprocessor);
   }
 
+  /* eslint no-undef: "off" */
   static Event: Class<Event>;
 }
 

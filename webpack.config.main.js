@@ -1,13 +1,13 @@
 const webpack = require('webpack');
-const { p } = require('./webpack.helpers');
+const { p, LIBRARY_FILE_NAME, LIBRARY_VAR_NAME } = require('./webpack.helpers');
 
 module.exports = {
   context: __dirname,
   entry: {
-    'event-dispatcher': p('source/index.js')
+    [LIBRARY_FILE_NAME]: p('source/index.js')
   },
   output: {
-    library: 'EventDispatcher',
+    library: LIBRARY_VAR_NAME,
     libraryTarget: 'umd',
     filename: '[name].js',
     path: p('dist'),
@@ -19,8 +19,7 @@ module.exports = {
         test: /\.js$/,
         include: [
           p('source'),
-          p('tests'),
-          p('node_modules/SymbolImpl')
+          p('tests')
         ],
         loader: 'babel-loader'
       }

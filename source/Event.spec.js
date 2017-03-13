@@ -2,14 +2,12 @@
  * Created by Oleg Galaburda on 15.02.16.
  */
 
-'use strict';
-
 import EventDispatcher, { Event } from './EventDispatcher';
 
 describe('Event', () => {
-  var event = '';
-  var data = '';
-  var type = '';
+  let event = '';
+  let data = '';
+  let type = '';
   beforeEach(() => {
     data = { value: false };
     type = 'someEventType';
@@ -41,14 +39,14 @@ describe('Event', () => {
     it('should include only type and data', () => {
       expect(event.toJSON()).to.be.eql({
         data: { value: false },
-        type: 'someEventType'
+        type: 'someEventType',
       });
     });
   });
 
   describe('When dispatched', () => {
-    var dispatcher;
-    var event;
+    let dispatcher;
+    let event;
     beforeEach(() => {
       dispatcher = new EventDispatcher();
       event = new Event('anyEvent');

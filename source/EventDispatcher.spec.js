@@ -2,8 +2,6 @@
  * Created by Oleg Galaburda on 09.02.16.
  */
 
-'use strict';
-
 import EventDispatcher, { Event } from './EventDispatcher';
 
 describe('EventDispatcher', () => {
@@ -90,7 +88,7 @@ describe('EventDispatcher', () => {
     let spy;
     beforeEach(() => {
       spy = sinon.spy(EventDispatcher.prototype, 'initialize');
-      new EventDispatcher(null, false);
+      const test = new EventDispatcher(null, false);
     });
     afterEach(() => {
       spy.restore();
@@ -104,7 +102,7 @@ describe('EventDispatcher', () => {
     let spy;
     beforeEach(() => {
       spy = sinon.spy(EventDispatcher.prototype, 'initialize');
-      new EventDispatcher(null, true);
+      const test = new EventDispatcher(null, true);
     });
     afterEach(() => {
       spy.restore();
@@ -120,7 +118,7 @@ describe('EventDispatcher', () => {
     let handlerAA = null;
     let handlerAAA = null;
     let handlerA1 = null;
-    let handlerA_1 = null;
+    let handlerAminus1 = null;
     let handlerB = null;
     let handlerC = null;
     beforeEach(() => {
@@ -128,14 +126,16 @@ describe('EventDispatcher', () => {
       handlerAA = sinon.spy();
       handlerAAA = sinon.spy();
       handlerA1 = sinon.spy();
-      handlerA_1 = sinon.spy();
+      handlerAminus1 = sinon.spy();
       handlerB = sinon.spy();
       handlerC = sinon.spy();
       dispatcher = new EventDispatcher();
     });
 
     describe('When created with preprocessor', () => {
-      let preprocessor, listener, dispatcher;
+      let preprocessor;
+      let listener;
+      let dispatcher;
       beforeEach(() => {
         preprocessor = sinon.spy((event) => {
           return { type: event.type, data: 'processed' };
@@ -191,7 +191,7 @@ describe('EventDispatcher', () => {
         dispatcher.addEventListener('eventA', handlerAA);
         dispatcher.addEventListener('eventA', handlerAAA);
         dispatcher.addEventListener('eventA', handlerA1, 1);
-        dispatcher.addEventListener('eventA', handlerA_1, -1);
+        dispatcher.addEventListener('eventA', handlerAminus1, -1);
         dispatcher.addEventListener('eventB', handlerB);
         dispatcher.addEventListener('eventC', handlerC);
       });
@@ -210,7 +210,7 @@ describe('EventDispatcher', () => {
         expect(dispatcher.hasEventListener('eventA')).to.be.true;
         dispatcher.removeEventListener('eventA', handlerA1);
         expect(dispatcher.hasEventListener('eventA')).to.be.true;
-        dispatcher.removeEventListener('eventA', handlerA_1);
+        dispatcher.removeEventListener('eventA', handlerAminus1);
         expect(dispatcher.hasEventListener('eventA')).to.be.false;
       });
       it('should allow deleting all listeners for event type', () => {
@@ -237,7 +237,7 @@ describe('EventDispatcher', () => {
           expect(dispatcher.hasEventListener('eventA')).to.be.true;
         });
         it('should allow re-adding listeners again', () => {
-          dispatcher.addEventListener('eventA', handlerA_1, -1);
+          dispatcher.addEventListener('eventA', handlerAminus1, -1);
           dispatcher.addEventListener('eventA', handlerA1, 1);
           dispatcher.addEventListener('eventA', handlerA);
           expect(dispatcher.hasEventListener('eventA')).to.be.true;
@@ -365,7 +365,7 @@ describe('EventDispatcher', () => {
           dispatcher.addEventListener('eventA', handlerAA);
           dispatcher.addEventListener('eventA', handlerAAA);
           dispatcher.addEventListener('eventA', handlerA1, 1);
-          dispatcher.addEventListener('eventA', handlerA_1, -1);
+          dispatcher.addEventListener('eventA', handlerAminus1, -1);
           dispatcher.dispatchEvent('eventA');
         });
         it('should stop after processing all listeners of same priority', () => {
@@ -373,7 +373,7 @@ describe('EventDispatcher', () => {
           expect(handlerA).to.be.calledOnce;
           expect(handlerAA).to.be.calledOnce;
           expect(handlerAAA).to.be.calledOnce;
-          expect(handlerA_1).to.not.be.called;
+          expect(handlerAminus1).to.not.be.called;
         });
       });
 
@@ -386,7 +386,7 @@ describe('EventDispatcher', () => {
           dispatcher.addEventListener('eventA', handlerAA);
           dispatcher.addEventListener('eventA', handlerAAA);
           dispatcher.addEventListener('eventA', handlerA1, 1);
-          dispatcher.addEventListener('eventA', handlerA_1, -1);
+          dispatcher.addEventListener('eventA', handlerAminus1, -1);
           dispatcher.dispatchEvent('eventA');
         });
         it('should stop immediately, dropping all next listeners', () => {
@@ -394,7 +394,7 @@ describe('EventDispatcher', () => {
           expect(handlerA).to.be.calledOnce;
           expect(handlerAA).to.not.be.called;
           expect(handlerAAA).to.not.be.called;
-          expect(handlerA_1).to.not.be.called;
+          expect(handlerAminus1).to.not.be.called;
         });
       });
     });

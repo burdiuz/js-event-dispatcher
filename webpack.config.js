@@ -1,5 +1,5 @@
 const webpack = require('webpack');
-const { p } = require('./webpack.helpers');
+const { p, LIBRARY_FILE_NAME } = require('./webpack.helpers');
 const mainConfig = require('./webpack.config.main');
 
 const minConfig = Object.assign({}, mainConfig, {
@@ -11,14 +11,14 @@ const minConfig = Object.assign({}, mainConfig, {
       compress: {
         warnings: false
       },
-	  sourceMap: true
+      sourceMap: true
     })
   ]
 });
 
 const directConfig = Object.assign({}, minConfig, {
   entry: {
-    'event-dispatcher': p('source/direct.js')
+    [LIBRARY_FILE_NAME]: p('source/direct.js')
   },
   output: Object.assign({}, mainConfig.output, {
     libraryTarget: 'var',

@@ -81,11 +81,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/**
- * Created by Oleg Galaburda on 09.02.16.
- * 
- */
-
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -98,6 +93,13 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var hasOwnProp = function hasOwnProp(target, name) {
+  return Object.prototype.hasOwnProperty.call(target, name);
+}; /**
+    * Created by Oleg Galaburda on 09.02.16.
+    * 
+    */
+
 var Event = exports.Event = function () {
   function Event(type, data) {
     _classCallCheck(this, Event);
@@ -105,8 +107,6 @@ var Event = exports.Event = function () {
     this.type = type;
     this.data = data || null;
     this.defaultPrevented = false;
-    this.stopPropagation;
-    this.stopImmediatePropagation;
   }
 
   _createClass(Event, [{
@@ -147,28 +147,27 @@ var EventListeners = function () {
   _createClass(EventListeners, [{
     key: 'createList',
     value: function createList(eventType, priority) {
-      return this.getListenersListByKey(parseInt(priority), this.getPrioritiesByKey(eventType));
+      priority = parseInt(priority, 10);
+      var target = this.getPrioritiesByKey(eventType);
+      var key = String(priority);
+      var value = void 0;
+      if (hasOwnProp(target, key)) {
+        value = target[key];
+      } else {
+        value = [];
+        target[key] = value;
+      }
+      return value;
     }
   }, {
     key: 'getPrioritiesByKey',
     value: function getPrioritiesByKey(key) {
       var value = void 0;
-      if (this._listeners.hasOwnProperty(key)) {
+      if (hasOwnProp(this._listeners, key)) {
         value = this._listeners[key];
       } else {
-        value = this._listeners[key] = {};
-      }
-      return value;
-    }
-  }, {
-    key: 'getListenersListByKey',
-    value: function getListenersListByKey(priority, target) {
-      var key = String(priority);
-      var value = void 0;
-      if (target.hasOwnProperty(key)) {
-        value = target[key];
-      } else {
-        value = target[key] = [];
+        value = {};
+        this._listeners[key] = value;
       }
       return value;
     }
@@ -183,11 +182,12 @@ var EventListeners = function () {
   }, {
     key: 'has',
     value: function has(eventType) {
+      var priority = void 0;
       var result = false;
       var priorities = this.getPrioritiesByKey(eventType);
       if (priorities) {
-        for (var _priority in priorities) {
-          if (priorities.hasOwnProperty(_priority)) {
+        for (priority in priorities) {
+          if (hasOwnProp(priorities, priority)) {
             result = true;
             break;
           }
@@ -203,13 +203,13 @@ var EventListeners = function () {
         var list = Object.getOwnPropertyNames(priorities);
         var length = list.length;
         for (var index = 0; index < length; index++) {
-          var _priority2 = list[index];
-          var handlers = priorities[_priority2];
+          var _priority = list[index];
+          var handlers = priorities[_priority];
           var handlerIndex = handlers.indexOf(handler);
           if (handlerIndex >= 0) {
             handlers.splice(handlerIndex, 1);
             if (!handlers.length) {
-              delete priorities[_priority2];
+              delete priorities[_priority];
             }
           }
         }
@@ -223,6 +223,7 @@ var EventListeners = function () {
   }, {
     key: 'call',
     value: function call(event, target) {
+      var handler = void 0;
       var _stopped = false;
       var _immediatelyStopped = false;
       var stopPropagation = function stopPropagation() {
@@ -246,9 +247,8 @@ var EventListeners = function () {
           var handlersLength = handlers.length;
           for (var handlersIndex = 0; handlersIndex < handlersLength; handlersIndex++) {
             if (_immediatelyStopped) break;
-            var handler = handlers[handlersIndex];
-            // FIXME why "handler" sometimes undefined?
-            handler && handler.call(target, event);
+            handler = handlers[handlersIndex];
+            handler.call(target, event);
           }
         }
       }
@@ -260,7 +260,7 @@ var EventListeners = function () {
   return EventListeners;
 }();
 
-var EventDispatcher = exports.EventDispatcher = function () {
+var EventDispatcher = function () {
   function EventDispatcher(eventPreprocessor) {
     var noInit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
@@ -332,6 +332,9 @@ var EventDispatcher = exports.EventDispatcher = function () {
     value: function create(eventPreprocessor) {
       return new EventDispatcher(eventPreprocessor);
     }
+
+    /* eslint no-undef: "off" */
+
   }]);
 
   return EventDispatcher;
@@ -351,7 +354,7 @@ exports.default = EventDispatcher;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Event = exports.EventDispatcher = undefined;
+exports.Event = undefined;
 
 var _EventDispatcher = __webpack_require__(0);
 
@@ -360,7 +363,6 @@ var _EventDispatcher2 = _interopRequireDefault(_EventDispatcher);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = _EventDispatcher2.default;
-exports.EventDispatcher = _EventDispatcher2.default;
 exports.Event = _EventDispatcher.Event;
 
 /***/ })

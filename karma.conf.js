@@ -9,8 +9,7 @@ module.exports = (config) => {
     exclude: [],
 
     preprocessors: {
-      'source/**/!(*.spec).js': ['webpack', 'sourcemap'],
-      'source/**/*.spec.js': ['webpack', 'sourcemap'],
+      'source/**/*.js': ['webpack', 'sourcemap'],
     },
     reporters: ['coverage', 'progress', 'coveralls'],
     coverageReporter: {
