@@ -6,9 +6,7 @@
 Just another EventDispatcher/[EventTarget](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget) implementation.
 
 ## Installation
-`Note: Version 1.0.5 dropped bower support`  
-
-Easy to install with [npm](https://www.npmjs.com/) package manager, by adding this repository to dependencies
+Easy to install with [bower](http://bower.io/) or [npm](https://www.npmjs.com/) package manager, by adding this repository to dependencies
 ```javascript
 "dependencies": {
   "event-dispatcher": "git://github.com/burdiuz/js-event-dispatcher.git"
@@ -16,7 +14,7 @@ Easy to install with [npm](https://www.npmjs.com/) package manager, by adding th
 ```
 
 ## Usage
-`Note: When used directly in browser you have to use "EventDispatcher.default" path to get access to EventDispatcher class, because its exported as ES2015 module`  
+`Note: When used directly in browser you may want to use "dist/event-dispatcher.direct.js" file, it provides globally accessible EventDispatcher object.  
 
 EventDispatcher distribution package is wrapped into UMD wrapper, so it can be used with any AMD module loader, nodejs `require()` or without any.
 To start using EventDispatcher, just instantiate it on its own
