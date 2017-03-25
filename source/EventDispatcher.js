@@ -3,19 +3,26 @@
  * @flow
  */
 
-import type { EventObject, EventType, EventListener, EventProcessor } from './TypeDefinition';
+import type {
+  EventObject,
+  EventType,
+  EventListener,
+  EventProcessor,
+  IEvent,
+  IEventDispatcher,
+} from './TypeDefinition';
 
 const hasOwnProp = (target: any, name: string): boolean => (
   Object.prototype.hasOwnProperty.call(target, name)
 );
 
-export class Event {
+export class Event implements IEvent {
 
   type: string;
   data: mixed;
   defaultPrevented: boolean;
-  stopPropagation: ?Function;
-  stopImmediatePropagation: ?Function;
+  stopPropagation: ?() => void;
+  stopImmediatePropagation: ?() => void;
 
   constructor(type: string, data: mixed) {
     this.type = type;
@@ -165,7 +172,7 @@ class EventListeners {
   }
 }
 
-class EventDispatcher {
+class EventDispatcher implements IEventDispatcher {
 
   _listeners: EventListeners;
   _eventPreprocessor: EventProcessor;
