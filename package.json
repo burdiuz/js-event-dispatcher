@@ -2,7 +2,7 @@
   "name": "event-dispatcher",
   "description": "EventDispatcher is a JavaScript class that adds events support to custom objects",
   "version": "1.0.8",
-  "main": "src/index.js",
+  "main": "source/index.js",
   "keywords": [
     "events",
     "object",
