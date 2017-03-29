@@ -3,6 +3,8 @@
  * @flow
  */
 
+'use strict';
+
 import type {
   EventObject,
   EventType,
@@ -44,31 +46,83 @@ export class Event implements IEvent {
 }
 
 type EventPrioritiesCollection = {
-  [priority:string]: Array<EventListener>;
+  [priority: string]: Array<EventListener>;
 }
 
 type EventTypesCollection = {
-  [eventType:string]: EventPrioritiesCollection;
+  [eventType: string]: EventPrioritiesCollection;
+}
+
+class ListenersRunner {
+  index: number = -1;
+  immediatelyStopped: boolean = false;
+  listeners: EventListener[];
+  onStopped: (runner: ListenersRunner) => void;
+  onComplete: (runner: ListenersRunner) => void;
+
+  constructor(
+    listeners: EventListener[],
+    onStopped: (runner: ListenersRunner) => void,
+    onComplete: (runner: ListenersRunner) => void,
+  ) {
+    this.listeners = listeners;
+    this.onStopped = onStopped;
+    this.onComplete = onComplete;
+  }
+
+  stopImmediatePropagation = () => {
+    this.immediatelyStopped = true;
+  };
+
+  run(event: EventObject, target: any) {
+    let listener: EventListener;
+    const listeners = this.listeners;
+    this.augmentEvent(event);
+    // TODO this has to be handled in separate object ListenersRunner that should be
+    // created foreach call() call and asked for index validation on each listener remove.
+    for (this.index = 0; this.index < listeners.length; this.index++) {
+      if (this.immediatelyStopped) break;
+      listener = listeners[this.index];
+      listener.call(target, event);
+    }
+    this.clearEvent(event);
+    this.onComplete(this);
+  }
+
+  augmentEvent(eventObject: EventObject) {
+    const event: EventObject = eventObject;
+    event.stopPropagation = this.onStopped;
+    event.stopImmediatePropagation = this.stopImmediatePropagation;
+  }
+
+  /* eslint class-methods-use-this: "off" */
+  clearEvent(eventObject: EventObject) {
+    const event: EventObject = eventObject;
+    delete event.stopPropagation;
+    delete event.stopImmediatePropagation;
+  }
+
+  listenerRemoved(listeners: EventListener[], index: number) {
+    if (listeners === this.listeners && index <= this.index) {
+      this.index--;
+    }
+  }
 }
 
 class EventListeners {
+  /**
+   * key - event Type
+   * value - hash of priorities
+   *    key - priority
+   *    value - list of handlers
+   * @type {Object<string, Object.<string, Array<number, Function>>>}
+   * @private
+   */
+  _listeners: EventTypesCollection = {};
+  _runners: ListenersRunner[] = [];
 
-  _listeners: EventTypesCollection;
-
-  constructor() {
-    /**
-     * key - event Type
-     * value - hash of priorities
-     *    key - priority
-     *    value - list of handlers
-     * @type {Object<string, Object.<string, Array<number, Function>>>}
-     * @private
-     */
-    this._listeners = {};
-  }
-
-  createList(eventType: string, priority: number): Array<EventListener> {
-    priority = parseInt(priority, 10);
+  createList(eventType: string, priorityOpt?: mixed): Array<EventListener> {
+    const priority: number = parseInt(priorityOpt, 10);
     const target: EventPrioritiesCollection = this.getPrioritiesByKey(eventType);
     const key: string = String(priority);
     let value: Array<EventListener>;
@@ -128,6 +182,9 @@ class EventListeners {
           if (!handlers.length) {
             delete priorities[priority];
           }
+          this._runners.forEach((runner) => {
+            runner.listenerRemoved(handlers, handlerIndex);
+          });
         }
       }
     }
@@ -137,19 +194,22 @@ class EventListeners {
     delete this._listeners[eventType];
   }
 
+  createRunner(handlers, onStopped) {
+    const runner = new ListenersRunner(handlers, onStopped, this.removeRunner);
+    this._runners.push(runner);
+    return runner;
+  }
+
+  removeRunner = (runner) => {
+    this._runners.splice(this._runners.indexOf(runner), 1);
+  }
+
   call(event: EventObject, target: any) {
-    let handler: EventListener;
-    let _stopped = false;
-    let _immediatelyStopped = false;
-    const stopPropagation = () => {
-      _stopped = true;
-    };
-    const stopImmediatePropagation = () => {
-      _immediatelyStopped = true;
-    };
-    event.stopPropagation = stopPropagation;
-    event.stopImmediatePropagation = stopImmediatePropagation;
     const priorities = this.getPrioritiesByKey(event.type, this._listeners);
+    let stopped = false;
+    const stopPropagation = () => {
+      stopped = true;
+    };
     if (priorities) {
       // getOwnPropertyNames() or keys()?
       const list: string[] = Object.getOwnPropertyNames(priorities).sort(
@@ -157,18 +217,13 @@ class EventListeners {
       );
       const length = list.length;
       for (let index = 0; index < length; index++) {
-        if (_stopped) break;
+        if (stopped) break;
         const handlers: Array<EventListener> = priorities[list[index]];
-        const handlersLength = handlers.length;
-        for (let handlersIndex = 0; handlersIndex < handlersLength; handlersIndex++) {
-          if (_immediatelyStopped) break;
-          handler = handlers[handlersIndex];
-          handler.call(target, event);
-        }
+        const runner = this.createRunner(handlers, stopPropagation);
+        runner.run(event, target);
+        if (runner.immediatelyStopped) break;
       }
     }
-    delete event.stopPropagation;
-    delete event.stopImmediatePropagation;
   }
 }
 
@@ -224,7 +279,7 @@ class EventDispatcher implements IEventDispatcher {
     if (!EventDispatcher.isObject(eventOrType)) {
       event = new EventDispatcher.Event(String(eventOrType), optionalData);
     }
-    return (event:any);
+    return (event: any);
   }
 
   static create(eventPreprocessor: EventProcessor) {
