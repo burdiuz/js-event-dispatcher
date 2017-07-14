@@ -2,8 +2,6 @@
  * Created by Oleg Galaburda on 15.02.16.
  */
 
-'use strict';
-
 import EventDispatcher, { Event } from './EventDispatcher';
 
 describe('Event', () => {
@@ -48,24 +46,24 @@ describe('Event', () => {
 
   describe('When dispatched', () => {
     let dispatcher;
-    let event;
+    let eventObject;
     beforeEach(() => {
       dispatcher = new EventDispatcher();
-      event = new Event('anyEvent');
+      eventObject = new Event('anyEvent');
     });
     it('should have stopPropagation()', () => {
-      dispatcher.addEventListener(event.type, () => {
-        expect(event.stopPropagation).to.be.an.instanceof(Function);
+      dispatcher.addEventListener(eventObject.type, () => {
+        expect(eventObject.stopPropagation).to.be.an.instanceof(Function);
       });
-      dispatcher.dispatchEvent(event);
-      expect(event.stopPropagation).to.be.undefined;
+      dispatcher.dispatchEvent(eventObject);
+      expect(eventObject.stopPropagation).to.be.undefined;
     });
     it('should have stopImmediatePropagation()', () => {
-      dispatcher.addEventListener(event.type, () => {
-        expect(event.stopImmediatePropagation).to.be.an.instanceof(Function);
+      dispatcher.addEventListener(eventObject.type, () => {
+        expect(eventObject.stopImmediatePropagation).to.be.an.instanceof(Function);
       });
-      dispatcher.dispatchEvent(event);
-      expect(event.stopImmediatePropagation).to.be.undefined;
+      dispatcher.dispatchEvent(eventObject);
+      expect(eventObject.stopImmediatePropagation).to.be.undefined;
     });
   });
 

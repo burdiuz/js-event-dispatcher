@@ -16,9 +16,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -129,25 +129,96 @@ var Event = exports.Event = function () {
   return Event;
 }();
 
+var ListenersRunner = function () {
+  function ListenersRunner(listeners, onStopped, onComplete) {
+    var _this = this;
+
+    _classCallCheck(this, ListenersRunner);
+
+    this.index = -1;
+    this.immediatelyStopped = false;
+
+    this.stopImmediatePropagation = function () {
+      _this.immediatelyStopped = true;
+    };
+
+    this.listeners = listeners;
+    this.onStopped = onStopped;
+    this.onComplete = onComplete;
+  }
+
+  _createClass(ListenersRunner, [{
+    key: 'run',
+    value: function run(event, target) {
+      var listener = void 0;
+      var listeners = this.listeners;
+      this.augmentEvent(event);
+      // TODO this has to be handled in separate object ListenersRunner that should be
+      // created for each call() call and asked for index validation on each listener remove.
+      for (this.index = 0; this.index < listeners.length; this.index++) {
+        if (this.immediatelyStopped) break;
+        listener = listeners[this.index];
+        listener.call(target, event);
+      }
+      this.clearEvent(event);
+      this.onComplete(this);
+    }
+  }, {
+    key: 'augmentEvent',
+    value: function augmentEvent(eventObject) {
+      var event = eventObject;
+      event.stopPropagation = this.onStopped;
+      event.stopImmediatePropagation = this.stopImmediatePropagation;
+    }
+
+    /* eslint class-methods-use-this: "off" */
+
+  }, {
+    key: 'clearEvent',
+    value: function clearEvent(eventObject) {
+      var event = eventObject;
+      delete event.stopPropagation;
+      delete event.stopImmediatePropagation;
+    }
+  }, {
+    key: 'listenerRemoved',
+    value: function listenerRemoved(listeners, index) {
+      if (listeners === this.listeners && index <= this.index) {
+        this.index--;
+      }
+    }
+  }]);
+
+  return ListenersRunner;
+}();
+
 var EventListeners = function () {
   function EventListeners() {
+    var _this2 = this;
+
     _classCallCheck(this, EventListeners);
 
-    /**
-     * key - event Type
-     * value - hash of priorities
-     *    key - priority
-     *    value - list of handlers
-     * @type {Object<string, Object.<string, Array<number, Function>>>}
-     * @private
-     */
     this._listeners = {};
+    this._runners = [];
+
+    this.removeRunner = function (runner) {
+      _this2._runners.splice(_this2._runners.indexOf(runner), 1);
+    };
   }
+  /**
+   * key - event Type
+   * value - hash of priorities
+   *    key - priority
+   *    value - list of handlers
+   * @type {Object<string, Object.<string, Array<number, Function>>>}
+   * @private
+   */
+
 
   _createClass(EventListeners, [{
     key: 'createList',
-    value: function createList(eventType, priority) {
-      priority = parseInt(priority, 10);
+    value: function createList(eventType, priorityOpt) {
+      var priority = parseInt(priorityOpt, 10);
       var target = this.getPrioritiesByKey(eventType);
       var key = String(priority);
       var value = void 0;
@@ -198,20 +269,30 @@ var EventListeners = function () {
   }, {
     key: 'remove',
     value: function remove(eventType, handler) {
+      var _this3 = this;
+
       var priorities = this.getPrioritiesByKey(eventType);
       if (priorities) {
         var list = Object.getOwnPropertyNames(priorities);
         var length = list.length;
-        for (var index = 0; index < length; index++) {
-          var _priority = list[index];
-          var handlers = priorities[_priority];
+
+        var _loop = function _loop(index) {
+          var priority = list[index];
+          var handlers = priorities[priority];
           var handlerIndex = handlers.indexOf(handler);
           if (handlerIndex >= 0) {
             handlers.splice(handlerIndex, 1);
             if (!handlers.length) {
-              delete priorities[_priority];
+              delete priorities[priority];
             }
+            _this3._runners.forEach(function (runner) {
+              runner.listenerRemoved(handlers, handlerIndex);
+            });
           }
+        };
+
+        for (var index = 0; index < length; index++) {
+          _loop(index);
         }
       }
     }
@@ -221,20 +302,20 @@ var EventListeners = function () {
       delete this._listeners[eventType];
     }
   }, {
+    key: 'createRunner',
+    value: function createRunner(handlers, onStopped) {
+      var runner = new ListenersRunner(handlers, onStopped, this.removeRunner);
+      this._runners.push(runner);
+      return runner;
+    }
+  }, {
     key: 'call',
     value: function call(event, target) {
-      var handler = void 0;
-      var _stopped = false;
-      var _immediatelyStopped = false;
-      var stopPropagation = function stopPropagation() {
-        _stopped = true;
-      };
-      var stopImmediatePropagation = function stopImmediatePropagation() {
-        _immediatelyStopped = true;
-      };
-      event.stopPropagation = stopPropagation;
-      event.stopImmediatePropagation = stopImmediatePropagation;
       var priorities = this.getPrioritiesByKey(event.type, this._listeners);
+      var stopped = false;
+      var stopPropagation = function stopPropagation() {
+        stopped = true;
+      };
       if (priorities) {
         // getOwnPropertyNames() or keys()?
         var list = Object.getOwnPropertyNames(priorities).sort(function (a, b) {
@@ -242,18 +323,17 @@ var EventListeners = function () {
         });
         var length = list.length;
         for (var index = 0; index < length; index++) {
-          if (_stopped) break;
-          var handlers = priorities[list[index]];
-          var handlersLength = handlers.length;
-          for (var handlersIndex = 0; handlersIndex < handlersLength; handlersIndex++) {
-            if (_immediatelyStopped) break;
-            handler = handlers[handlersIndex];
-            handler.call(target, event);
+          if (stopped) break;
+          var _handlers = priorities[list[index]];
+          // in case if all handlers of priority were removed while event
+          // was dispatched and handlers become undefined.
+          if (_handlers) {
+            var _runner = this.createRunner(_handlers, stopPropagation);
+            _runner.run(event, target);
+            if (_runner.immediatelyStopped) break;
           }
         }
       }
-      delete event.stopPropagation;
-      delete event.stopImmediatePropagation;
     }
   }]);
 

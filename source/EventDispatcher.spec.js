@@ -2,8 +2,6 @@
  * Created by Oleg Galaburda on 09.02.16.
  */
 
-'use strict';
-
 import EventDispatcher, { Event } from './EventDispatcher';
 
 describe('EventDispatcher', () => {
@@ -137,11 +135,8 @@ describe('EventDispatcher', () => {
     describe('When created with preprocessor', () => {
       let preprocessor;
       let listener;
-      let dispatcher;
       beforeEach(() => {
-        preprocessor = sinon.spy((event) => {
-          return { type: event.type, data: 'processed' };
-        });
+        preprocessor = sinon.spy((event) => ({ type: event.type, data: 'processed' }));
         dispatcher = new EventDispatcher(preprocessor);
         listener = sinon.spy();
         dispatcher.addEventListener('event', listener);
@@ -357,6 +352,35 @@ describe('EventDispatcher', () => {
         });
       });
 
+      describe('When removing handlers while event is propagated', () => {
+        let myHandler;
+        beforeEach(() => {
+          myHandler = sinon.spy((event) => {
+            dispatcher.removeEventListener('eventA', handlerA);
+            dispatcher.removeEventListener('eventA', myHandler);
+            dispatcher.removeEventListener('eventA', handlerAA);
+            dispatcher.removeEventListener('eventA', handlerA1, 1);
+            dispatcher.removeEventListener('eventA', handlerAminus1, -1);
+          });
+          dispatcher.addEventListener('eventA', handlerA);
+          dispatcher.addEventListener('eventA', myHandler);
+          dispatcher.addEventListener('eventA', handlerAA);
+          dispatcher.addEventListener('eventA', handlerAAA);
+          dispatcher.addEventListener('eventA', handlerA1, 1);
+          dispatcher.addEventListener('eventA', handlerAminus1, -1);
+          dispatcher.dispatchEvent('eventA');
+        });
+
+        it('should call only available handlers', () => {
+          expect(handlerA).to.be.calledOnce;
+          expect(myHandler).to.be.calledOnce;
+          expect(handlerA1).to.be.calledOnce;
+          expect(handlerAAA).to.be.calledOnce;
+          expect(handlerAA).to.not.be.called;
+          expect(handlerAminus1).to.not.be.called;
+        });
+
+      });
 
       describe('When stopping propagation', () => {
         beforeEach(() => {

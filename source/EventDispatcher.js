@@ -3,8 +3,6 @@
  * @flow
  */
 
-'use strict';
-
 import type {
   EventObject,
   EventType,
@@ -79,7 +77,7 @@ class ListenersRunner {
     const listeners = this.listeners;
     this.augmentEvent(event);
     // TODO this has to be handled in separate object ListenersRunner that should be
-    // created foreach call() call and asked for index validation on each listener remove.
+    // created for each call() call and asked for index validation on each listener remove.
     for (this.index = 0; this.index < listeners.length; this.index++) {
       if (this.immediatelyStopped) break;
       listener = listeners[this.index];
@@ -202,7 +200,7 @@ class EventListeners {
 
   removeRunner = (runner) => {
     this._runners.splice(this._runners.indexOf(runner), 1);
-  }
+  };
 
   call(event: EventObject, target: any) {
     const priorities = this.getPrioritiesByKey(event.type, this._listeners);
@@ -219,9 +217,13 @@ class EventListeners {
       for (let index = 0; index < length; index++) {
         if (stopped) break;
         const handlers: Array<EventListener> = priorities[list[index]];
-        const runner = this.createRunner(handlers, stopPropagation);
-        runner.run(event, target);
-        if (runner.immediatelyStopped) break;
+        // in case if all handlers of priority were removed while event
+        // was dispatched and handlers become undefined.
+        if (handlers) {
+          const runner = this.createRunner(handlers, stopPropagation);
+          runner.run(event, target);
+          if (runner.immediatelyStopped) break;
+        }
       }
     }
   }
