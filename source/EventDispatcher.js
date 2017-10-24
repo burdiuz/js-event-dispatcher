@@ -74,7 +74,7 @@ class ListenersRunner {
 
   run(event: EventObject, target: any) {
     let listener: EventListener;
-    const listeners = this.listeners;
+    const { listeners } = this;
     this.augmentEvent(event);
     // TODO this has to be handled in separate object ListenersRunner that should be
     // created for each call() call and asked for index validation on each listener remove.
@@ -170,7 +170,7 @@ class EventListeners {
     const priorities = this.getPrioritiesByKey(eventType);
     if (priorities) {
       const list = Object.getOwnPropertyNames(priorities);
-      const length = list.length;
+      const { length } = list;
       for (let index = 0; index < length; index++) {
         const priority = list[index];
         const handlers = priorities[priority];
@@ -203,17 +203,17 @@ class EventListeners {
   };
 
   call(event: EventObject, target: any) {
-    const priorities = this.getPrioritiesByKey(event.type, this._listeners);
+    const priorities = this.getPrioritiesByKey(event.type);
     let stopped = false;
     const stopPropagation = () => {
       stopped = true;
     };
     if (priorities) {
       // getOwnPropertyNames() or keys()?
-      const list: string[] = Object.getOwnPropertyNames(priorities).sort(
-        (a: any, b: any) => (a - b),
-      );
-      const length = list.length;
+      const list: string[] = Object
+        .getOwnPropertyNames(priorities)
+        .sort((a: any, b: any) => (a - b));
+      const { length } = list;
       for (let index = 0; index < length; index++) {
         if (stopped) break;
         const handlers: Array<EventListener> = priorities[list[index]];

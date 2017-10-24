@@ -1,5 +1,5 @@
 const webpack = require('webpack');
-const { p, LIBRARY_FILE_NAME, LIBRARY_VAR_NAME } = require('./webpack.helpers');
+const { p, LIBRARY_FILE_NAME, LIBRARY_VAR_NAME, getBabelLoader } = require('./webpack.helpers');
 
 module.exports = {
   context: __dirname,
@@ -14,17 +14,16 @@ module.exports = {
     publicPath: 'http://localhost:8081/dist/',
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
         include: [
           p('source'),
-          p('tests')
+          p('tests'),
         ],
-        loader: 'babel-loader'
-      }
-    ]
+        use: getBabelLoader(),
+      },
+    ],
   },
-  devtool: 'source-map'
+  devtool: 'source-map',
 };
-

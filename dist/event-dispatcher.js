@@ -43,9 +43,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
 /******/
-/******/ 	// identity function for calling harmony imports with the correct context
-/******/ 	__webpack_require__.i = function(value) { return value; };
-/******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
@@ -73,11 +70,32 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "http://localhost:8081/dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Event = undefined;
+
+var _EventDispatcher = __webpack_require__(1);
+
+var _EventDispatcher2 = _interopRequireDefault(_EventDispatcher);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = _EventDispatcher2.default;
+exports.Event = _EventDispatcher.Event;
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -152,6 +170,7 @@ var ListenersRunner = function () {
     value: function run(event, target) {
       var listener = void 0;
       var listeners = this.listeners;
+
       this.augmentEvent(event);
       // TODO this has to be handled in separate object ListenersRunner that should be
       // created for each call() call and asked for index validation on each listener remove.
@@ -311,7 +330,7 @@ var EventListeners = function () {
   }, {
     key: 'call',
     value: function call(event, target) {
-      var priorities = this.getPrioritiesByKey(event.type, this._listeners);
+      var priorities = this.getPrioritiesByKey(event.type);
       var stopped = false;
       var stopPropagation = function stopPropagation() {
         stopped = true;
@@ -322,6 +341,7 @@ var EventListeners = function () {
           return a - b;
         });
         var length = list.length;
+
         for (var index = 0; index < length; index++) {
           if (stopped) break;
           var _handlers = priorities[list[index]];
@@ -423,27 +443,6 @@ var EventDispatcher = function () {
 EventDispatcher.Event = Event;
 
 exports.default = EventDispatcher;
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Event = undefined;
-
-var _EventDispatcher = __webpack_require__(0);
-
-var _EventDispatcher2 = _interopRequireDefault(_EventDispatcher);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = _EventDispatcher2.default;
-exports.Event = _EventDispatcher.Event;
 
 /***/ })
 /******/ ]);
