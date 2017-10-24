@@ -25,10 +25,15 @@ module.exports = (config) => {
       module: {
         rules: [
           {
+            test: /\.spec\.js$/,
+            use: getBabelLoader(),
+          },
+          {
             test: /\.js$/,
+            exclude: /\.spec\.js$/,
             use: getBabelLoader(['babel-plugin-istanbul']),
           },
-        ]
+        ],
       },
       devtool: 'inline-source-map',
     },
