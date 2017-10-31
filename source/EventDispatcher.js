@@ -24,9 +24,9 @@ export class Event implements IEvent {
   stopPropagation: ?() => void;
   stopImmediatePropagation: ?() => void;
 
-  constructor(type: string, data: mixed) {
+  constructor(type: string, data: mixed = null) {
     this.type = type;
-    this.data = data || null;
+    this.data = data;
     this.defaultPrevented = false;
   }
 
@@ -234,7 +234,7 @@ class EventDispatcher implements IEventDispatcher {
   _listeners: EventListeners;
   _eventPreprocessor: EventProcessor;
 
-  constructor(eventPreprocessor: EventProcessor, noInit: boolean = false) {
+  constructor(eventPreprocessor: EventProcessor = null, noInit: boolean = false) {
     if (!noInit) {
       this.initialize(eventPreprocessor);
     }
@@ -243,7 +243,7 @@ class EventDispatcher implements IEventDispatcher {
   /**
    * @private
    */
-  initialize(eventPreprocessor: EventProcessor) {
+  initialize(eventPreprocessor: EventProcessor = null) {
     this._eventPreprocessor = eventPreprocessor;
     this._listeners = new EventListeners();
   }
