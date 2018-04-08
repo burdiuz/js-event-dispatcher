@@ -1,7 +1,7 @@
 {
-  "name": "event-dispatcher",
+  "name": "@actualwave/event-dispatcher",
   "description": "EventDispatcher is a JavaScript class that adds events support to custom objects",
-  "version": "1.1.12",
+  "version": "1.1.13",
   "main": "dist/event-dispatcher.js",
   "keywords": [
     "events",
@@ -9,7 +9,10 @@
     "fire",
     "handle",
     "listener",
-    "dispatcher"
+    "dispatcher",
+	"addEventListener",
+	"removeEventListener",
+	"dispatchEvent"
   ],
   "homepage": "https://github.com/burdiuz/js-event-dispatcher",
   "bugs": {
