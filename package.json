@@ -113,7 +113,7 @@
     "start": "npm run build",
     "build": "rollup --config",
     "build:watch": "rollup --config --watch \"./source\"",
-    "lint": "./node_modules/.bin/eslint \"source/**/*.js\" -c eslintrc.json",
+    "lint": "./node_modules/.bin/eslint \"source/**/*.js\"",
     "flow": "./node_modules/.bin/flow",
     "server": "rollup --config rollup.serve.js",
     "test": "jest --colors",
