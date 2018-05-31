@@ -1,3 +1,3 @@
-import EventDispatcher from './EventDispatcher';
+const EventDispatcher = require('./EventDispatcher');
 
-module.exports = EventDispatcher;
+module.exports = EventDispatcher.default || EventDispatcher;

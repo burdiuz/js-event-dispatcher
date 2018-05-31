@@ -2,42 +2,46 @@
  * Created by Oleg Galaburda on 15.02.16.
  */
 
-import EventDispatcher, { Event } from './EventDispatcher';
+import EventDispatcher, { Event } from '../EventDispatcher';
 
 describe('Event', () => {
   let event = '';
   let data = '';
   let type = '';
+
   beforeEach(() => {
     data = { value: false };
     type = 'someEventType';
     event = new Event(type, data);
   });
+
   it('should have type', () => {
-    expect(event.type).to.be.equal(type);
+    expect(event.type).toBe(type);
   });
+
   it('should have data', () => {
-    expect(event.data).to.be.equal(data);
+    expect(event.data).toBe(data);
   });
 
   describe('preventDefault()', () => {
     it('should not be prevented from init', () => {
-      expect(event.isDefaultPrevented()).to.be.false;
+      expect(event.isDefaultPrevented()).toBe(false);
     });
 
     describe('When called', () => {
       beforeEach(() => {
         event.preventDefault();
       });
+
       it('should become prevented', () => {
-        expect(event.isDefaultPrevented()).to.be.true;
+        expect(event.isDefaultPrevented()).toBe(true);
       });
     });
   });
 
   describe('toJSON()', () => {
     it('should include only type and data', () => {
-      expect(event.toJSON()).to.be.eql({
+      expect(event.toJSON()).toEqual({
         data: { value: false },
         type: 'someEventType',
       });
@@ -51,20 +55,23 @@ describe('Event', () => {
       dispatcher = new EventDispatcher();
       eventObject = new Event('anyEvent');
     });
+
     it('should have stopPropagation()', () => {
       dispatcher.addEventListener(eventObject.type, () => {
-        expect(eventObject.stopPropagation).to.be.an.instanceof(Function);
+        expect(eventObject.stopPropagation).toBeInstanceOf(Function);
       });
+
       dispatcher.dispatchEvent(eventObject);
-      expect(eventObject.stopPropagation).to.be.undefined;
+      expect(eventObject.stopPropagation).toBeUndefined();
     });
+
     it('should have stopImmediatePropagation()', () => {
       dispatcher.addEventListener(eventObject.type, () => {
-        expect(eventObject.stopImmediatePropagation).to.be.an.instanceof(Function);
+        expect(eventObject.stopImmediatePropagation).toBeInstanceOf(Function);
       });
+
       dispatcher.dispatchEvent(eventObject);
-      expect(eventObject.stopImmediatePropagation).to.be.undefined;
+      expect(eventObject.stopImmediatePropagation).toBeUndefined();
     });
   });
-
 });

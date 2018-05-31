@@ -2,6 +2,7 @@
  * Created by Oleg Galaburda on 09.02.16.
  * @flow
  */
+import hasOwn from '@actualwave/has-own';
 
 import type {
   EventObject,
@@ -12,12 +13,7 @@ import type {
   IEventDispatcher,
 } from './TypeDefinition';
 
-const hasOwnProp = (target: any, name: string): boolean => (
-  Object.prototype.hasOwnProperty.call(target, name)
-);
-
 export class Event implements IEvent {
-
   type: string;
   data: mixed;
   defaultPrevented: boolean;
@@ -44,12 +40,12 @@ export class Event implements IEvent {
 }
 
 type EventPrioritiesCollection = {
-  [priority: string]: Array<EventListener>;
-}
+  [priority: string]: Array<EventListener>,
+};
 
 type EventTypesCollection = {
-  [eventType: string]: EventPrioritiesCollection;
-}
+  [eventType: string]: EventPrioritiesCollection,
+};
 
 class ListenersRunner {
   index: number = -1;
@@ -124,7 +120,7 @@ class EventListeners {
     const target: EventPrioritiesCollection = this.getPrioritiesByKey(eventType);
     const key: string = String(priority);
     let value: Array<EventListener>;
-    if (hasOwnProp(target, key)) {
+    if (hasOwn(target, key)) {
       value = target[key];
     } else {
       value = [];
@@ -135,7 +131,7 @@ class EventListeners {
 
   getPrioritiesByKey(key: string): EventPrioritiesCollection {
     let value: EventPrioritiesCollection;
-    if (hasOwnProp(this._listeners, key)) {
+    if (hasOwn(this._listeners, key)) {
       value = this._listeners[key];
     } else {
       value = {};
@@ -157,7 +153,7 @@ class EventListeners {
     const priorities = this.getPrioritiesByKey(eventType);
     if (priorities) {
       for (priority in priorities) {
-        if (hasOwnProp(priorities, priority)) {
+        if (hasOwn(priorities, priority)) {
           result = true;
           break;
         }
@@ -210,9 +206,7 @@ class EventListeners {
     };
     if (priorities) {
       // getOwnPropertyNames() or keys()?
-      const list: string[] = Object
-        .getOwnPropertyNames(priorities)
-        .sort((a: any, b: any) => (a - b));
+      const list: string[] = Object.getOwnPropertyNames(priorities).sort((a: any, b: any) => a - b);
       const { length } = list;
       for (let index = 0; index < length; index++) {
         if (stopped) break;
@@ -230,11 +224,13 @@ class EventListeners {
 }
 
 class EventDispatcher implements IEventDispatcher {
-
   _listeners: EventListeners;
-  _eventPreprocessor: EventProcessor;
+  _eventPreprocessor: ?EventProcessor;
 
-  constructor(eventPreprocessor: EventProcessor = null, noInit: boolean = false) {
+  constructor(
+    eventPreprocessor: ?EventProcessor = null,
+    noInit: boolean = false,
+  ) {
     if (!noInit) {
       this.initialize(eventPreprocessor);
     }
@@ -243,12 +239,16 @@ class EventDispatcher implements IEventDispatcher {
   /**
    * @private
    */
-  initialize(eventPreprocessor: EventProcessor = null) {
+  initialize(eventPreprocessor: ?EventProcessor = null) {
     this._eventPreprocessor = eventPreprocessor;
     this._listeners = new EventListeners();
   }
 
-  addEventListener(eventType: string, listener: EventListener, priority: number = 0) {
+  addEventListener(
+    eventType: string,
+    listener: EventListener,
+    priority: number = 0,
+  ) {
     this._listeners.add(eventType, listener, -priority || 0);
   }
 
@@ -273,7 +273,7 @@ class EventDispatcher implements IEventDispatcher {
   }
 
   static isObject(value: mixed) {
-    return (typeof value === 'object') && (value !== null);
+    return typeof value === 'object' && value !== null;
   }
 
   static getEvent(eventOrType: EventType, optionalData: mixed): EventObject {
