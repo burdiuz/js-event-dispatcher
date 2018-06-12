@@ -247,7 +247,7 @@ class EventDispatcher implements IEventDispatcher {
   addEventListener(
     eventType: string,
     listener: EventListener,
-    priority: number = 0,
+    priority?: number = 0,
   ) {
     this._listeners.add(eventType, listener, -priority || 0);
   }
@@ -288,10 +288,7 @@ class EventDispatcher implements IEventDispatcher {
     return new EventDispatcher(eventPreprocessor);
   }
 
-  /* eslint no-undef: "off" */
-  static Event: Class<Event>;
+  static Event: Class<Event> = Event;
 }
-
-EventDispatcher.Event = Event;
 
 export default EventDispatcher;
