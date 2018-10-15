@@ -1,6 +1,6 @@
 import { Event, getEvent } from './Event';
-import EventDispatcher from './EventDispatcher';
+import EventDispatcher, { create } from './EventDispatcher';
 import { isObject } from './utils';
 
 export default EventDispatcher;
-export { Event, EventDispatcher, getEvent, isObject };
+export { Event, EventDispatcher, create, getEvent, isObject };

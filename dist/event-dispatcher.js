@@ -7,6 +7,8 @@
   /**
    *      
    */
+
+  /* eslint-disable import/prefer-default-export */
   const isObject = value => typeof value === 'object' && value !== null;
 
   /**
@@ -306,17 +308,16 @@
       this._listeners.call(eventObject);
     }
 
-    static create(eventPreprocessor) {
-      return new EventDispatcher(eventPreprocessor);
-    }
-
   }
 
-  EventDispatcher.Event = Event;
+  const create = eventPreprocessor => {
+    return new EventDispatcher(eventPreprocessor);
+  };
 
   exports.default = EventDispatcher;
   exports.Event = Event;
   exports.EventDispatcher = EventDispatcher;
+  exports.create = create;
   exports.getEvent = getEvent;
   exports.isObject = isObject;
 

@@ -2,7 +2,7 @@
  * Created by Oleg Galaburda on 09.02.16.
  * @flow
  */
-import { Event, getEvent } from './Event';
+import { getEvent } from './Event';
 import { EventListeners } from './EventListeners';
 
 import type { EventType, EventListener, EventProcessor, IEventDispatcher } from './TypeDefinition';
@@ -40,12 +40,8 @@ class EventDispatcher implements IEventDispatcher {
     }
     this._listeners.call(eventObject);
   }
-
-  static create(eventPreprocessor: EventProcessor) {
-    return new EventDispatcher(eventPreprocessor);
-  }
-
-  static Event: Class<Event> = Event; // eslint-disable-line
 }
+
+export const create = (eventPreprocessor: EventProcessor) => new EventDispatcher(eventPreprocessor);
 
 export default EventDispatcher;
