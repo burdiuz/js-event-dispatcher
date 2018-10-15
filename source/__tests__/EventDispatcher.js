@@ -2,143 +2,29 @@
  * Created by Oleg Galaburda on 09.02.16.
  */
 
-import { EventDispatcher, Event } from '../index';
+import { EventDispatcher, create, Event, isObject } from '../index';
 
 describe('EventDispatcher', () => {
   describe('isObject', () => {
     it('should return true for object', () => {
-      expect(EventDispatcher.isObject({})).toBe(true);
+      expect(isObject({})).toBe(true);
     });
 
     it('should return false for null', () => {
-      expect(EventDispatcher.isObject(null)).toBe(false);
+      expect(isObject(null)).toBe(false);
     });
 
     it('should return false for primitive', () => {
-      expect(EventDispatcher.isObject(1)).toBe(false);
-      expect(EventDispatcher.isObject(1.56)).toBe(false);
-      expect(EventDispatcher.isObject(true)).toBe(false);
-      expect(EventDispatcher.isObject('string')).toBe(false);
-    });
-  });
-
-  describe('getEvent', () => {
-    describe('When event type passed', () => {
-      let event = null;
-
-      beforeEach(() => {
-        event = EventDispatcher.getEvent('event-type');
-      });
-
-      it('should store event type', () => {
-        expect(event.type).toBe('event-type');
-      });
-
-      it('data should be null', () => {
-        expect(event.data).toBeNull();
-      });
-    });
-
-    describe('When event type with data passed', () => {
-      let event = null;
-
-      beforeEach(() => {
-        event = EventDispatcher.getEvent('event-type', 'some data');
-      });
-
-      it('data store passed value', () => {
-        expect(event.data).toBe('some data');
-      });
-    });
-
-    describe("When event type is'n a string", () => {
-      let event = null;
-
-      beforeEach(() => {
-        event = EventDispatcher.getEvent(256);
-      });
-
-      it('should create event object with number-string as type', () => {
-        expect(event.type).toBe('256');
-      });
-    });
-
-    describe('When event object passed', () => {
-      let event = null;
-
-      beforeEach(() => {
-        event = EventDispatcher.getEvent({
-          type: 'event-type',
-          data: 'some data',
-          value: 'some-value',
-        });
-      });
-
-      it('should keep event object unchanged', () => {
-        expect(event).toEqual({
-          type: 'event-type',
-          data: 'some data',
-          value: 'some-value',
-        });
-      });
-    });
-
-    describe('When event object and data passed', () => {
-      let event = null;
-
-      beforeEach(() => {
-        event = EventDispatcher.getEvent(
-          {
-            type: 'event-type',
-            data: 'some data',
-          },
-          'another-data',
-        );
-      });
-
-      it('should ignore passed data', () => {
-        expect(event.data).toBe('some data');
-      });
+      expect(isObject(1)).toBe(false);
+      expect(isObject(1.56)).toBe(false);
+      expect(isObject(true)).toBe(false);
+      expect(isObject('string')).toBe(false);
     });
   });
 
   describe('create()', () => {
     it('should result in EventDispatcher instance', () => {
-      expect(EventDispatcher.create()).toBeInstanceOf(EventDispatcher);
-    });
-  });
-
-  describe('create with noInit = false', () => {
-    let spy;
-
-    beforeEach(() => {
-      spy = jest.spyOn(EventDispatcher.prototype, 'initialize');
-      (() => null)(new EventDispatcher(null, false));
-    });
-
-    afterEach(() => {
-      spy.mockRestore();
-    });
-
-    it('should result in EventDispatcher instance', () => {
-      expect(spy).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('create with noInit = true', () => {
-    let spy;
-
-    beforeEach(() => {
-      spy = jest.spyOn(EventDispatcher.prototype, 'initialize');
-      (() => null)(new EventDispatcher(null, true));
-    });
-
-    afterEach(() => {
-      spy.mockRestore();
-    });
-
-    it('should result in EventDispatcher instance', () => {
-      expect(spy).not.toHaveBeenCalled();
+      expect(create()).toBeInstanceOf(EventDispatcher);
     });
   });
 
@@ -191,10 +77,12 @@ describe('EventDispatcher', () => {
 
         it('should call preprocessor', () => {
           expect(preprocessor).toHaveBeenCalledTimes(1);
-          expect(preprocessor).toHaveBeenCalledWith(expect.objectContaining({
-            type: 'event',
-            data: 'anything',
-          }));
+          expect(preprocessor).toHaveBeenCalledWith(
+            expect.objectContaining({
+              type: 'event',
+              data: 'anything',
+            }),
+          );
         });
 
         it('preprocessor should receive scope of dispatchEvent method', () => {
@@ -203,9 +91,11 @@ describe('EventDispatcher', () => {
 
         it('listener should receive processed event', () => {
           expect(listener).toHaveBeenCalledTimes(1);
-          expect(listener).toHaveBeenCalledWith(expect.objectContaining({
-            data: 'processed',
-          }));
+          expect(listener).toHaveBeenCalledWith(
+            expect.objectContaining({
+              data: 'processed',
+            }),
+          );
         });
       });
 
@@ -216,17 +106,21 @@ describe('EventDispatcher', () => {
 
         it('preprocessor should receive event object', () => {
           expect(preprocessor).toHaveBeenCalledTimes(1);
-          expect(preprocessor).toHaveBeenCalledWith(expect.objectContaining({
-            type: 'event',
-            data: 'anything',
-          }));
+          expect(preprocessor).toHaveBeenCalledWith(
+            expect.objectContaining({
+              type: 'event',
+              data: 'anything',
+            }),
+          );
         });
 
         it('listener should receive processed event', () => {
           expect(listener).toHaveBeenCalledTimes(1);
-          expect(listener).toHaveBeenCalledWith(expect.objectContaining({
-            data: 'processed',
-          }));
+          expect(listener).toHaveBeenCalledWith(
+            expect.objectContaining({
+              data: 'processed',
+            }),
+          );
         });
       });
     });
@@ -323,9 +217,11 @@ describe('EventDispatcher', () => {
         });
 
         it('should store data', () => {
-          expect(handlerB).toHaveBeenCalledWith(expect.objectContaining({
-            data: ['any-data', 3],
-          }));
+          expect(handlerB).toHaveBeenCalledWith(
+            expect.objectContaining({
+              data: ['any-data', 3],
+            }),
+          );
         });
       });
 

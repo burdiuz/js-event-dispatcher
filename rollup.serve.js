@@ -1,14 +1,23 @@
 import serve from 'rollup-plugin-serve';
-import { plugins, baseConfig } from './rollup.helpers';
+import livereload from 'rollup-plugin-livereload';
+
+import { plugins, umdConfig, DESTINATION_FOLDER } from './rollup.helpers';
 
 export default {
-  ...baseConfig,
+  ...umdConfig,
   plugins: [
     ...plugins,
-	serve({
+    serve({
       open: true,
-	  port: 8081,
-	    contentBase: '.',
-	}),
+      host: 'localhost',
+      port: 8881,
+      contentBase: ['dist', 'example'],
+    }),
+    livereload({ watch: [DESTINATION_FOLDER, 'example'] }),
   ],
+  watch: {
+    include: 'source/**',
+    chokidar: true,
+    clearScreen: false,
+  },
 };

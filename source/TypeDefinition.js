@@ -3,17 +3,11 @@
  */
 
 export type EventObject = {
-  type: string;
-  data?: mixed;
-  stopPropagation?: ?Function;
-  stopImmediatePropagation?: ?Function;
+  type: string,
+  data?: mixed,
+  stopPropagation?: ?Function,
+  stopImmediatePropagation?: ?Function,
 };
-
-export type EventType = string | EventObject;
-
-export type EventListener = (event?: EventObject) => void;
-
-export type EventProcessor = (event: EventObject) => EventObject;
 
 export interface IEvent {
   type: string;
@@ -26,8 +20,18 @@ export interface IEvent {
   preventDefault(): void;
 }
 
+export type EventType = string | EventObject | IEvent;
+
+export type EventListener = (event?: EventObject) => void;
+
+export type EventProcessor = (event: EventObject) => EventObject;
+
 export interface IEventDispatcher {
-  addEventListener(eventType: string, listener: EventListener, priority?: number): void;
+  addEventListener(
+    eventType: string,
+    listener: EventListener,
+    priority?: number
+  ): void;
   hasEventListener(eventType: string): boolean;
   removeEventListener(eventType: string, listener: EventListener): void;
   removeAllEventListeners(eventType: string): void;

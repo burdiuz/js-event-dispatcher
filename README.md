@@ -8,13 +8,17 @@ Just another EventDispatcher/[EventTarget](https://developer.mozilla.org/en-US/d
 ## Installation
 Easy to install with [npm](https://www.npmjs.com/) package manager
 ```javascript
-npm install @actualwave/event-dispatcher
+npm install --save @actualwave/event-dispatcher
+```
+with [yarn](https://yarnpkg.com/) package manager
+```javascript
+yarn add @actualwave/event-dispatcher
 ```
 
 ## Usage
-`Note: When used directly in browser you may want to use "dist/event-dispatcher.direct.js" file, it provides globally accessible EventDispatcher object.
 
-EventDispatcher distribution package is wrapped into UMD wrapper, so it can be used with any AMD module loader, nodejs `require()` or without any.
+> Note: EventDispatcher distribution package contains `dist/` folder with package wrapped into UMD wrapper, so it can be used with any AMD module loader, nodejs `require()` or without any.
+
 To start using EventDispatcher, just instantiate it on its own
 ```javascript
 class MyClass {
@@ -87,7 +91,7 @@ Example available in project's `example` folder. To try example first run server
 ```javascript
 npm run server
 ```
-And then go to [http://localhost:8081/example/index.html](http://localhost:8081/example/index.html)
+And then go to [http://localhost:8081/index.html](http://localhost:8081/index.html)
 
 ## API
 
