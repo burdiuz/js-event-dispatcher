@@ -2,7 +2,7 @@
  * Created by Oleg Galaburda on 09.02.16.
  */
 
-import { EventDispatcher, create, Event, isObject } from '../index';
+import { EventDispatcher, createEventDispatcher, Event, isObject } from '../index';
 
 describe('EventDispatcher', () => {
   describe('isObject', () => {
@@ -24,7 +24,7 @@ describe('EventDispatcher', () => {
 
   describe('create()', () => {
     it('should result in EventDispatcher instance', () => {
-      expect(create()).toBeInstanceOf(EventDispatcher);
+      expect(createEventDispatcher()).toBeInstanceOf(EventDispatcher);
     });
   });
 

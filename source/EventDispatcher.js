@@ -42,6 +42,6 @@ class EventDispatcher implements IEventDispatcher {
   }
 }
 
-export const create = (eventPreprocessor: EventProcessor) => new EventDispatcher(eventPreprocessor);
+export const createEventDispatcher = (eventPreprocessor: EventProcessor) => new EventDispatcher(eventPreprocessor);
 
 export default EventDispatcher;

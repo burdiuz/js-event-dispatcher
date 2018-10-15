@@ -287,14 +287,12 @@ class EventDispatcher {
 
 }
 
-const create = eventPreprocessor => {
-  return new EventDispatcher(eventPreprocessor);
-};
+const createEventDispatcher = eventPreprocessor => new EventDispatcher(eventPreprocessor);
 
 exports.default = EventDispatcher;
 exports.Event = Event;
 exports.EventDispatcher = EventDispatcher;
-exports.create = create;
+exports.createEventDispatcher = createEventDispatcher;
 exports.getEvent = getEvent;
 exports.isObject = isObject;
 //# sourceMappingURL=index.js.map

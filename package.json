@@ -1,7 +1,7 @@
 {
   "name": "@actualwave/event-dispatcher",
   "description": "EventDispatcher is a JavaScript class that adds events support to custom objects.",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "main": "index.js",
   "keywords": [
     "event",
@@ -105,7 +105,8 @@
       "!**/vendor/**"
     ],
     "modulePathIgnorePatterns": [
-      "\\/\\."
+      "\\/\\.",
+      ".history"
     ]
   },
   "scripts": {
