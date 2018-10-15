@@ -3,21 +3,22 @@ import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import flow from 'rollup-plugin-flow';
 import json from 'rollup-plugin-json';
-import uglify from 'rollup-plugin-uglify';
-import { minify } from 'uglify-es';
+import { terser } from 'rollup-plugin-terser';
 
-export const LIBRARY_FILE_NAME = 'event-dispatcher'; // dummy, replace with project name
-export const LIBRARY_VAR_NAME = 'EventDispatcher'; // dummy, replace with project name
+export const DESTINATION_FOLDER = 'dist';
+
+export const LIBRARY_FILE_NAME = 'event-dispatcher'
+export const LIBRARY_VAR_NAME = 'EventDispatcher';
 
 export const plugins = [
   resolve(),
   flow(),
   babel({
     plugins: [
+      '@babel/plugin-external-helpers',
+      '@babel/plugin-transform-flow-strip-types',
+      '@babel/plugin-syntax-object-rest-spread',
       'babel-plugin-transform-class-properties',
-      'babel-plugin-transform-flow-strip-types',
-      ['babel-plugin-transform-object-rest-spread', { useBuiltIns: true }],
-      'babel-plugin-external-helpers',
     ],
     exclude: 'node_modules/**',
     externalHelpers: true,
@@ -27,14 +28,13 @@ export const plugins = [
   json(),
 ];
 
-export const baseConfig = {
+export const cjsConfig = {
   input: 'source/index.js',
   output: [
     {
-      file: `dist/${LIBRARY_FILE_NAME}.js`,
+      file: 'index.js',
       sourcemap: true,
       exports: 'named',
-      name: LIBRARY_VAR_NAME,
       format: 'cjs',
     },
   ],
@@ -44,37 +44,20 @@ export const baseConfig = {
   ],
 };
 
-export const directConfig = {
-  input: 'source/direct.js',
-  output: [
-    {
-      file: `dist/${LIBRARY_FILE_NAME}.direct.js`,
-      sourcemap: true,
-      exports: 'default',
-      name: LIBRARY_VAR_NAME,
-      format: 'umd',
-    },
-  ],
-  plugins: [
-    ...plugins,
-    uglify({}, minify),
-  ],
-};
-
-
-export const minConfig = {
+const makeUMDConfig = (suffix = '', additionalPlugins = []) => ({
   input: 'source/index.js',
   output: [
     {
-      file: `dist/${LIBRARY_FILE_NAME}.min.js`,
+      file: `${DESTINATION_FOLDER}/${LIBRARY_FILE_NAME}${suffix}.js`,
       sourcemap: true,
       exports: 'named',
       name: LIBRARY_VAR_NAME,
       format: 'umd',
     },
   ],
-  plugins: [
-    ...plugins,
-    uglify({}, minify),
-  ],
-};
+  plugins: [...plugins, ...additionalPlugins],
+});
+
+export const umdConfig = makeUMDConfig();
+
+export const umdMinConfig = makeUMDConfig('.min', [terser()]);

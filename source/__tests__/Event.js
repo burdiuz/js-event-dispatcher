@@ -2,7 +2,7 @@
  * Created by Oleg Galaburda on 15.02.16.
  */
 
-import EventDispatcher, { Event } from '../EventDispatcher';
+import { EventDispatcher, Event, getEvent } from '../index';
 
 describe('Event', () => {
   let event = '';
@@ -72,6 +72,76 @@ describe('Event', () => {
 
       dispatcher.dispatchEvent(eventObject);
       expect(eventObject.stopImmediatePropagation).toBeUndefined();
+    });
+  });
+
+  describe('getEvent()', () => {
+    describe('When event type passed', () => {
+      beforeEach(() => {
+        event = getEvent('event-type');
+      });
+
+      it('should store event type', () => {
+        expect(event.type).toBe('event-type');
+      });
+
+      it('data should be null', () => {
+        expect(event.data).toBeNull();
+      });
+    });
+
+    describe('When event type with data passed', () => {
+      beforeEach(() => {
+        event = getEvent('event-type', 'some data');
+      });
+
+      it('data store passed value', () => {
+        expect(event.data).toBe('some data');
+      });
+    });
+
+    describe("When event type is'n a string", () => {
+      beforeEach(() => {
+        event = getEvent(256);
+      });
+
+      it('should create event object with number-string as type', () => {
+        expect(event.type).toBe('256');
+      });
+    });
+
+    describe('When event object passed', () => {
+      beforeEach(() => {
+        event = getEvent({
+          type: 'event-type',
+          data: 'some data',
+          value: 'some-value',
+        });
+      });
+
+      it('should keep event object unchanged', () => {
+        expect(event).toEqual({
+          type: 'event-type',
+          data: 'some data',
+          value: 'some-value',
+        });
+      });
+    });
+
+    describe('When event object and data passed', () => {
+      beforeEach(() => {
+        event = getEvent(
+          {
+            type: 'event-type',
+            data: 'some data',
+          },
+          'another-data',
+        );
+      });
+
+      it('should ignore passed data', () => {
+        expect(event.data).toBe('some data');
+      });
     });
   });
 });
