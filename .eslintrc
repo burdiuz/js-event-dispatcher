@@ -1,49 +1,24 @@
 {
-  "parser": "babel-eslint",
-  "extends": "airbnb",
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "parserOptions": {
-    "ecmaVersion": 6,
-    "ecmaFeatures": {
-      "impliedStrict": true,
-      "experimentalObjectRestSpread": true
-    }
+    "ecmaVersion": 2022,
+    "sourceType": "module"
   },
   "env": {
     "browser": true,
-    "node": true
-  },
-  "globals": {
-    "jest": true,
-    "describe": true,
-    "it": true,
-    "test": true,
-    "expect": true,
-    "should": true,
-    "assert": true,
-    "beforeEach": true,
-    "afterEach": true,
-    "beforeAll": true,
-    "afterAll": true,
-    "before": true,
-    "after": true
+    "node": true,
+    "jest": true
   },
   "rules": {
-    "arrow-parens": [
-      "error",
-      "always"
-    ],
+    "arrow-parens": ["error", "always"],
     "linebreak-style": 0,
     "no-underscore-dangle": 0,
-    "no-restricted-syntax": [
-      "error",
-      "WithStatement"
-    ],
+    "no-restricted-syntax": ["error", "WithStatement"],
     "no-param-reassign": 1,
-    "padded-blocks": 0,
     "no-plusplus": 0,
-    "function-paren-newline": 0,
-    "object-curly-newline": 0,
-    "no-bitwise": 0,
-    "max-len": ["error", { "code": 120 }]
+    "max-len": ["error", { "code": 120 }],
+    "@typescript-eslint/no-explicit-any": "warn"
   }
 }

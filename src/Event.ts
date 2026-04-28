@@ -1,22 +1,18 @@
-/**
- * Created by Oleg Galaburda on 09.02.16.
- * @flow
- */
 import { isObject } from './utils';
 import type { EventType, EventObject, IEvent } from './TypeDefinition';
 
 export class Event implements IEvent {
   type: string;
 
-  data: mixed;
+  data: unknown;
 
   defaultPrevented: boolean;
 
-  stopPropagation: ?() => void;
+  stopPropagation?: (() => void) | null;
 
-  stopImmediatePropagation: ?() => void;
+  stopImmediatePropagation?: (() => void) | null;
 
-  constructor(type: string, data: mixed = null) {
+  constructor(type: string, data: unknown = null) {
     this.type = type;
     this.data = data;
     this.defaultPrevented = false;
@@ -30,17 +26,16 @@ export class Event implements IEvent {
     return this.defaultPrevented;
   }
 
-  preventDefault() {
+  preventDefault(): void {
     this.defaultPrevented = true;
   }
 }
 
-export const getEvent = (eventOrType: EventType, optionalData: mixed): EventObject => {
-  let event = eventOrType;
+export const getEvent = (eventOrType: EventType, optionalData?: unknown): EventObject => {
   if (!isObject(eventOrType)) {
-    event = new Event(String(eventOrType), optionalData);
+    return new Event(String(eventOrType), optionalData);
   }
-  return (event: any);
+  return eventOrType as EventObject;
 };
 
 export default Event;

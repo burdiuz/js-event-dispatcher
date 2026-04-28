@@ -1,8 +1,7 @@
-/**
- * Created by Oleg Galaburda on 09.02.16.
- */
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { EventDispatcher, createEventDispatcher, Event, isObject } from './index';
 
-import { EventDispatcher, createEventDispatcher, Event, isObject } from '../index';
+type MockFn = ReturnType<typeof jest.fn>;
 
 describe('EventDispatcher', () => {
   describe('isObject', () => {
@@ -29,14 +28,14 @@ describe('EventDispatcher', () => {
   });
 
   describe('Instance', () => {
-    let dispatcher = null;
-    let handlerA = null;
-    let handlerAA = null;
-    let handlerAAA = null;
-    let handlerA1 = null;
-    let handlerAminus1 = null;
-    let handlerB = null;
-    let handlerC = null;
+    let dispatcher: EventDispatcher;
+    let handlerA: MockFn;
+    let handlerAA: MockFn;
+    let handlerAAA: MockFn;
+    let handlerA1: MockFn;
+    let handlerAminus1: MockFn;
+    let handlerB: MockFn;
+    let handlerC: MockFn;
 
     beforeEach(() => {
       handlerA = jest.fn();
@@ -50,13 +49,12 @@ describe('EventDispatcher', () => {
     });
 
     describe('When created with preprocessor', () => {
-      let preprocessor;
-      let target;
-      let listener;
+      let preprocessor: MockFn;
+      let target: unknown;
+      let listener: MockFn;
 
-      function mockPreprocessor(event) {
+      function mockPreprocessor(this: unknown, event: any) {
         target = this;
-
         return {
           type: event.type,
           data: 'processed',
@@ -205,8 +203,8 @@ describe('EventDispatcher', () => {
         it('should create Event object', () => {
           const arg = handlerA.mock.calls[0][0];
           expect(arg).toBeInstanceOf(Event);
-          expect(arg.type).toBe('eventA');
-          expect(arg.data).toBeNull();
+          expect((arg as Event).type).toBe('eventA');
+          expect((arg as Event).data).toBeNull();
         });
       });
 
@@ -226,7 +224,7 @@ describe('EventDispatcher', () => {
       });
 
       describe('When using Event instance', () => {
-        let event = null;
+        let event: Event;
 
         beforeEach(() => {
           event = new Event('eventC');
@@ -240,7 +238,7 @@ describe('EventDispatcher', () => {
       });
 
       describe('When using event object literal', () => {
-        let event = null;
+        let event: any;
 
         beforeEach(() => {
           event = { type: 'eventC', data: 1234, bubble: false };
@@ -260,7 +258,7 @@ describe('EventDispatcher', () => {
       });
 
       describe('When using multiple listeners', () => {
-        let stack = null;
+        let stack: number[];
 
         beforeEach(() => {
           stack = [];
@@ -282,7 +280,7 @@ describe('EventDispatcher', () => {
       });
 
       describe('When using priorities', () => {
-        let stack = null;
+        let stack: number[];
 
         beforeEach(() => {
           stack = [];
@@ -326,15 +324,15 @@ describe('EventDispatcher', () => {
       });
 
       describe('When removing handlers while event is propagated', () => {
-        let myHandler;
+        let myHandler: MockFn;
 
         beforeEach(() => {
           myHandler = jest.fn(() => {
             dispatcher.removeEventListener('eventA', handlerA);
             dispatcher.removeEventListener('eventA', myHandler);
             dispatcher.removeEventListener('eventA', handlerAA);
-            dispatcher.removeEventListener('eventA', handlerA1, 1);
-            dispatcher.removeEventListener('eventA', handlerAminus1, -1);
+            dispatcher.removeEventListener('eventA', handlerA1);
+            dispatcher.removeEventListener('eventA', handlerAminus1);
           });
 
           dispatcher.addEventListener('eventA', handlerA);
@@ -360,7 +358,7 @@ describe('EventDispatcher', () => {
         beforeEach(() => {
           dispatcher.addEventListener('eventA', handlerA);
           dispatcher.addEventListener('eventA', (event) => {
-            event.stopPropagation();
+            event!.stopPropagation!();
           });
 
           dispatcher.addEventListener('eventA', handlerAA);
@@ -383,7 +381,7 @@ describe('EventDispatcher', () => {
         beforeEach(() => {
           dispatcher.addEventListener('eventA', handlerA);
           dispatcher.addEventListener('eventA', (event) => {
-            event.stopImmediatePropagation();
+            event!.stopImmediatePropagation!();
           });
           dispatcher.addEventListener('eventA', handlerAA);
           dispatcher.addEventListener('eventA', handlerAAA);

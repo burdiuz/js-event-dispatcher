@@ -1,6 +1,6 @@
 .*
 coverage/
 fixtures/
-source/
+src/
 __tests__/
 rollup.*

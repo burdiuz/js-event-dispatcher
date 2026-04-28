@@ -1,13 +1,10 @@
-/**
- * Created by Oleg Galaburda on 15.02.16.
- */
-
-import { EventDispatcher, Event, getEvent } from '../index';
+import { describe, it, expect, beforeEach } from '@jest/globals';
+import { EventDispatcher, Event, getEvent } from './index';
 
 describe('Event', () => {
-  let event = '';
-  let data = '';
-  let type = '';
+  let event: any;
+  let data: any;
+  let type: string;
 
   beforeEach(() => {
     data = { value: false };
@@ -49,8 +46,9 @@ describe('Event', () => {
   });
 
   describe('When dispatched', () => {
-    let dispatcher;
-    let eventObject;
+    let dispatcher: EventDispatcher;
+    let eventObject: Event;
+
     beforeEach(() => {
       dispatcher = new EventDispatcher();
       eventObject = new Event('anyEvent');
@@ -58,20 +56,20 @@ describe('Event', () => {
 
     it('should have stopPropagation()', () => {
       dispatcher.addEventListener(eventObject.type, () => {
-        expect(eventObject.stopPropagation).toBeInstanceOf(Function);
+        expect((eventObject as any).stopPropagation).toBeInstanceOf(Function);
       });
 
       dispatcher.dispatchEvent(eventObject);
-      expect(eventObject.stopPropagation).toBeUndefined();
+      expect((eventObject as any).stopPropagation).toBeUndefined();
     });
 
     it('should have stopImmediatePropagation()', () => {
       dispatcher.addEventListener(eventObject.type, () => {
-        expect(eventObject.stopImmediatePropagation).toBeInstanceOf(Function);
+        expect((eventObject as any).stopImmediatePropagation).toBeInstanceOf(Function);
       });
 
       dispatcher.dispatchEvent(eventObject);
-      expect(eventObject.stopImmediatePropagation).toBeUndefined();
+      expect((eventObject as any).stopImmediatePropagation).toBeUndefined();
     });
   });
 
@@ -102,7 +100,7 @@ describe('Event', () => {
 
     describe("When event type is'n a string", () => {
       beforeEach(() => {
-        event = getEvent(256);
+        event = getEvent(256 as any);
       });
 
       it('should create event object with number-string as type', () => {
@@ -116,7 +114,7 @@ describe('Event', () => {
           type: 'event-type',
           data: 'some data',
           value: 'some-value',
-        });
+        } as any);
       });
 
       it('should keep event object unchanged', () => {
