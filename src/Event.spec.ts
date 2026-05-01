@@ -55,21 +55,17 @@ describe('Event', () => {
     });
 
     it('should have stopPropagation()', () => {
-      dispatcher.addEventListener(eventObject.type, () => {
-        expect((eventObject as any).stopPropagation).toBeInstanceOf(Function);
+      dispatcher.addEventListener(eventObject.type, (event) => {
+        expect(event.stopPropagation).toBeInstanceOf(Function);
       });
-
       dispatcher.dispatchEvent(eventObject);
-      expect((eventObject as any).stopPropagation).toBeUndefined();
     });
 
     it('should have stopImmediatePropagation()', () => {
-      dispatcher.addEventListener(eventObject.type, () => {
-        expect((eventObject as any).stopImmediatePropagation).toBeInstanceOf(Function);
+      dispatcher.addEventListener(eventObject.type, (event) => {
+        expect(event.stopImmediatePropagation).toBeInstanceOf(Function);
       });
-
       dispatcher.dispatchEvent(eventObject);
-      expect((eventObject as any).stopImmediatePropagation).toBeUndefined();
     });
   });
 

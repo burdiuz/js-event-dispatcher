@@ -13,6 +13,7 @@ class EventDispatcher implements IEventDispatcher {
   }
 
   addEventListener(eventType: string, listener: EventListener, priority = 0): void {
+    // Negate priority so higher values sort first (ascending sort order in EventListeners)
     this._listeners.add(eventType, listener, -priority || 0);
   }
 

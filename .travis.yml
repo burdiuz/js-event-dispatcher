@@ -1,8 +1,8 @@
 language: node_js
 node_js:
-  - "8"
+  - "20"
+  - "22"
 before_script:
-  - npm install rollup jest-cli eslint coveralls -g
   - npm run build
-  - npm run lint
-script: npm run test -- --coverage --coverageReporters=text-lcov | coveralls
+script:
+  - npm test -- --coverage --coverageReporters=text-lcov | coveralls

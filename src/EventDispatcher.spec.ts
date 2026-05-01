@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { EventDispatcher, createEventDispatcher, Event, isObject } from './index';
+import type { EventObject } from './index';
 
 type MockFn = ReturnType<typeof jest.fn>;
 
@@ -24,6 +25,14 @@ describe('EventDispatcher', () => {
   describe('create()', () => {
     it('should result in EventDispatcher instance', () => {
       expect(createEventDispatcher()).toBeInstanceOf(EventDispatcher);
+    });
+
+    it('should pass preprocessor to the instance', () => {
+      const preprocessor = jest.fn((event: EventObject) => event);
+      const dispatcher = createEventDispatcher(preprocessor);
+      dispatcher.addEventListener('event', jest.fn());
+      dispatcher.dispatchEvent('event');
+      expect(preprocessor).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -139,6 +148,11 @@ describe('EventDispatcher', () => {
         expect(dispatcher.hasEventListener('eventB')).toBe(true);
         expect(dispatcher.hasEventListener('eventC')).toBe(true);
         expect(dispatcher.hasEventListener('eventD')).toBe(false);
+      });
+
+      it('should do nothing when removing a listener for an unregistered event type', () => {
+        expect(() => dispatcher.removeEventListener('eventZ', handlerA)).not.toThrow();
+        expect(dispatcher.hasEventListener('eventZ')).toBe(false);
       });
 
       it('should allow deleting specific listener', () => {
@@ -358,7 +372,7 @@ describe('EventDispatcher', () => {
         beforeEach(() => {
           dispatcher.addEventListener('eventA', handlerA);
           dispatcher.addEventListener('eventA', (event) => {
-            event!.stopPropagation!();
+            event.stopPropagation();
           });
 
           dispatcher.addEventListener('eventA', handlerAA);
@@ -381,7 +395,7 @@ describe('EventDispatcher', () => {
         beforeEach(() => {
           dispatcher.addEventListener('eventA', handlerA);
           dispatcher.addEventListener('eventA', (event) => {
-            event!.stopImmediatePropagation!();
+            event.stopImmediatePropagation();
           });
           dispatcher.addEventListener('eventA', handlerAA);
           dispatcher.addEventListener('eventA', handlerAAA);

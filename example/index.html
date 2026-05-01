@@ -10,9 +10,12 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
             integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
             crossorigin="anonymous"></script>
-    <script type="text/javascript" src="event-dispatcher.js"></script>
-    <script type="text/javascript">
-      var controller = Object.assign(new EventDispatcher.default(), {
+    <script>
+      let exports = {};
+    </script>
+    <script src="../dist/index.js"></script>
+    <script>
+      let controller = Object.assign(new exports.EventDispatcher(), {
         start: function () {
           if (this.intervalId) {
             this.stop();
@@ -41,7 +44,7 @@
         });
 
         controller.addEventListener('time', function (event) {
-          $('.time').val(event.data);
+          $('.time').val(new Date(event.data).toTimeString());
         });
       });
     </script>

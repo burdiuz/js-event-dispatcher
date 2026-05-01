@@ -118,4 +118,8 @@ Any event(instance of built-in Event class or any other object passed as event) 
 * **stopImmediatePropagation**():void - Stop event propagation on current listener.
 
 
+## Claude / AI Agent Skill
+
+This package includes a `SKILL.md` file ([Agent Skills](https://agentskills.io/) format) that teaches AI coding assistants how to use the library. When installed as an npm dependency, the skill is available at `node_modules/@actualwave/event-dispatcher/dist/SKILL.md` and can be loaded by Claude Code or any compatible agent to get accurate, up-to-date usage guidance without relying on training data.
+
 > Written with [StackEdit](https://stackedit.io/).

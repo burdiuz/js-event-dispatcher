@@ -4,4 +4,4 @@ import { isObject } from './utils';
 
 export default EventDispatcher;
 export { Event, EventDispatcher, createEventDispatcher, getEvent, isObject };
-export type { EventObject, IEvent, EventType, EventListener, EventProcessor, IEventDispatcher } from './TypeDefinition';
+export type { EventObject, DispatchedEvent, EventType, EventListener, EventProcessor, IEventDispatcher } from './TypeDefinition';

@@ -1,24 +1,16 @@
 export type EventObject = {
   type: string;
   data?: unknown;
-  stopPropagation?: (() => void) | null;
-  stopImmediatePropagation?: (() => void) | null;
 };
 
-export interface IEvent {
-  type: string;
-  data: unknown;
-  defaultPrevented: boolean;
-  stopPropagation?: (() => void) | null;
-  stopImmediatePropagation?: (() => void) | null;
-  toJSON(): EventObject;
-  isDefaultPrevented(): boolean;
-  preventDefault(): void;
-}
+export type DispatchedEvent = EventObject & {
+  stopPropagation: () => void;
+  stopImmediatePropagation: () => void;
+};
 
-export type EventType = string | EventObject | IEvent;
+export type EventType = string | EventObject;
 
-export type EventListener = (event?: EventObject) => void;
+export type EventListener = (event: DispatchedEvent) => void;
 
 export type EventProcessor = (event: EventObject) => EventObject;
 

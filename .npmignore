@@ -1,6 +1,8 @@
 .*
 coverage/
 fixtures/
+example/
 src/
 __tests__/
 rollup.*
+tsconfig.json

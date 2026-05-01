@@ -83,7 +83,7 @@ export class EventListeners {
     this._runners.splice(this._runners.indexOf(runner), 1);
   };
 
-  call(event: EventObject, target?: unknown): void {
+  call(event: EventObject): void {
     if (!Object.hasOwn(this._listeners, event.type)) {
       return;
     }
@@ -98,7 +98,7 @@ export class EventListeners {
       const handlers = priorities[key];
       if (handlers) {
         const runner = this.createRunner(handlers, stopPropagation);
-        runner.run(event, target);
+        runner.run(event);
         if (runner.immediatelyStopped) break;
       }
     }

@@ -1,4 +1,4 @@
-import type { EventObject, EventListener } from './TypeDefinition';
+import type { EventObject, DispatchedEvent, EventListener } from './TypeDefinition';
 
 export class ListenersRunner {
   index: number = -1;
@@ -25,25 +25,17 @@ export class ListenersRunner {
     this.immediatelyStopped = true;
   };
 
-  run(event: EventObject, target?: unknown): void {
-    const { listeners } = this;
-    this.augmentEvent(event);
-    for (this.index = 0; this.index < listeners.length; this.index++) {
+  run(event: EventObject): void {
+    const dispatched = event as DispatchedEvent;
+    dispatched.stopPropagation = this.onStopped;
+    dispatched.stopImmediatePropagation = this.stopImmediatePropagation;
+    for (this.index = 0; this.index < this.listeners.length; this.index++) {
       if (this.immediatelyStopped) break;
-      listeners[this.index].call(target, event);
+      this.listeners[this.index](dispatched);
     }
-    this.clearEvent(event);
+    delete (event as Partial<DispatchedEvent>).stopPropagation;
+    delete (event as Partial<DispatchedEvent>).stopImmediatePropagation;
     this.onComplete(this);
-  }
-
-  augmentEvent(event: EventObject): void {
-    event.stopPropagation = this.onStopped;
-    event.stopImmediatePropagation = this.stopImmediatePropagation;
-  }
-
-  clearEvent(event: EventObject): void {
-    delete event.stopPropagation;
-    delete event.stopImmediatePropagation;
   }
 
   listenerRemoved(listeners: EventListener[], index: number): void {

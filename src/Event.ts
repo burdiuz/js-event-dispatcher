@@ -1,21 +1,16 @@
 import { isObject } from './utils';
-import type { EventType, EventObject, IEvent } from './TypeDefinition';
+import type { EventType, EventObject } from './TypeDefinition';
 
-export class Event implements IEvent {
+export class Event {
   type: string;
 
   data: unknown;
 
-  defaultPrevented: boolean;
-
-  stopPropagation?: (() => void) | null;
-
-  stopImmediatePropagation?: (() => void) | null;
+  defaultPrevented: boolean = false;
 
   constructor(type: string, data: unknown = null) {
     this.type = type;
     this.data = data;
-    this.defaultPrevented = false;
   }
 
   toJSON(): EventObject {
