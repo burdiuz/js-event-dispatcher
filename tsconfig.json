@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
-    "target": "ES2019",
+    "target": "ES2020",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "lib": ["ES2022"],
     "strict": true,
-    "declaration": true,
-    "declarationDir": "dist",
-    "rootDir": "src",
     "sourceMap": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "rootDir": "src"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*.ts"],
   "exclude": ["src/**/*.spec.ts", "node_modules"]
 }

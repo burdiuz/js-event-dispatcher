@@ -17,7 +17,7 @@ yarn add @actualwave/event-dispatcher
 
 ## Usage
 
-> Note: EventDispatcher distribution package contains `dist/` folder with package wrapped into UMD wrapper, so it can be used with any AMD module loader, nodejs `require()` or without any.
+> Note: EventDispatcher distribution package contains package wrapped into UMD wrapper, so it can be used with any AMD module loader, nodejs `require()` or without any.
 
 To start using EventDispatcher, just instantiate it on its own
 ```javascript
